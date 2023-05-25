@@ -30,7 +30,7 @@
     "connect": "^3.7.0",
     "di": "^0.0.1",
     "dom-serialize": "^2.2.1",
-    "glob": "^7.1.7",
+    "glob": "^10.2.6",
     "graceful-fs": "^4.2.11",
     "http-proxy": "^1.18.1",
     "isbinaryfile": "^4.0.8",
