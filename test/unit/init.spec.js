@@ -5,7 +5,7 @@ describe('init', () => {
   let m = null
 
   beforeEach(() => {
-    m = loadFile(path.join(__dirname, '/../../lib/init.js'), { glob: require('glob') })
+    m = loadFile(path.join(__dirname, '/../../lib/init.js'), { glob: require('glob').glob })
     sinon.stub(m, 'installPackage')
   })
 
