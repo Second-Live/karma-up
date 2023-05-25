@@ -29,13 +29,11 @@ const PATTERN_LIST = {
 }
 
 const MG = {
-  statCache: {
-    '/some/a.js': { mtime: new Date() },
-    '/some/b.js': { mtime: new Date() },
-    '/a.txt': { mtime: new Date() },
-    '/b.txt': { mtime: new Date() },
-    '/c.txt': { mtime: new Date() }
-  }
+  '/some/a.js': new Date(),
+  '/some/b.js': new Date(),
+  '/a.txt': new Date(),
+  '/b.txt': new Date(),
+  '/c.txt': new Date()
 }
 const mockFs = mocks.fs.create({
   some: {
@@ -74,11 +72,11 @@ describe('FileList', () => {
       emitter = new EventEmitter()
 
       glob = {
-        Glob: function (pattern, opts) {
-          return {
-            found: patternList[pattern],
-            statCache: mg.statCache
-          }
+        glob: async function (pattern, opts) {
+          return patternList[pattern].map((path) => ({
+            fullpath () { return path },
+            mtime: mg[path]
+          }))
         }
       }
 
@@ -198,16 +196,16 @@ describe('FileList', () => {
   describe('_exists', () => {
     beforeEach(() => {
       patternList = _.cloneDeep(PATTERN_LIST)
-      mg = _.cloneDeep(MG)
+      mg = { ...MG }
 
       emitter = new EventEmitter()
 
       glob = {
-        Glob: function (pattern, opts) {
-          return {
-            found: patternList[pattern],
-            statCache: mg.statCache
-          }
+        glob: async function (pattern, opts) {
+          return patternList[pattern].map((path) => ({
+            fullpath () { return path },
+            mtime: mg[path]
+          }))
         }
       }
 
@@ -237,15 +235,15 @@ describe('FileList', () => {
   describe('refresh', () => {
     beforeEach(() => {
       patternList = _.cloneDeep(PATTERN_LIST)
-      mg = _.cloneDeep(MG)
+      mg = { ...MG }
       emitter = new EventEmitter()
 
       glob = {
-        Glob: function (pattern, opts) {
-          return {
-            found: patternList[pattern],
-            statCache: mg.statCache
-          }
+        glob: async function (pattern, opts) {
+          return patternList[pattern].map((path) => ({
+            fullpath () { return path },
+            mtime: mg[path]
+          }))
         }
       }
 
@@ -289,7 +287,7 @@ describe('FileList', () => {
 
       const p1 = list.refresh().then(checkResult)
       patternList['/some/*.js'].push('/some/c.js')
-      mg.statCache['/some/c.js'] = { mtime: new Date(Date.now() + 5000) }
+      mg['/some/c.js'] = { mtime: new Date(Date.now() + 5000) }
       const p2 = list.refresh().then(checkResult)
       let called = false
       const callback = (data) => {
@@ -312,8 +310,8 @@ describe('FileList', () => {
         const file1 = findFile('/some/a.js', bucket)
         const file2 = findFile('/some/b.js', bucket)
 
-        expect(file1.mtime).to.be.eql(mg.statCache['/some/a.js'].mtime)
-        expect(file2.mtime).to.be.eql(mg.statCache['/some/b.js'].mtime)
+        expect(file1.mtime).to.be.eql(mg['/some/a.js'])
+        expect(file2.mtime).to.be.eql(mg['/some/b.js'])
       })
     })
 
@@ -326,8 +324,8 @@ describe('FileList', () => {
         const file1 = findFile('/some/a.js', bucket)
         const file2 = findFile('/some/b.js', bucket)
 
-        expect(file1.mtime).to.be.eql(mg.statCache['/some/a.js'].mtime)
-        expect(file2.mtime).to.be.eql(mg.statCache['/some/b.js'].mtime)
+        expect(file1.mtime).to.be.eql(mg['/some/a.js'])
+        expect(file2.mtime).to.be.eql(mg['/some/b.js'])
       })
     })
 
@@ -431,11 +429,11 @@ describe('FileList', () => {
       emitter = new EventEmitter()
 
       glob = {
-        Glob: function (pattern, opts) {
-          return {
-            found: patternList[pattern],
-            statCache: mg.statCache
-          }
+        glob: async function (pattern, opts) {
+          return patternList[pattern].map((path) => ({
+            fullpath () { return path },
+            mtime: mg[path]
+          }))
         }
       }
 
@@ -560,11 +558,11 @@ describe('FileList', () => {
       emitter = new EventEmitter()
 
       glob = {
-        Glob: function (pattern, opts) {
-          return {
-            found: patternList[pattern],
-            statCache: mg.statCache
-          }
+        glob: async function (pattern, opts) {
+          return patternList[pattern].map((path) => ({
+            fullpath () { return path },
+            mtime: mg[path]
+          }))
         }
       }
 
@@ -682,11 +680,11 @@ describe('FileList', () => {
       emitter = new EventEmitter()
 
       glob = {
-        Glob: function (pattern, opts) {
-          return {
-            found: patternList[pattern],
-            statCache: mg.statCache
-          }
+        glob: async function (pattern, opts) {
+          return patternList[pattern].map((path) => ({
+            fullpath () { return path },
+            mtime: mg[path]
+          }))
         }
       }
 
@@ -761,11 +759,11 @@ describe('FileList', () => {
       emitter = new EventEmitter()
 
       glob = {
-        Glob: function (pattern, opts) {
-          return {
-            found: patternList[pattern],
-            statCache: mg.statCache
-          }
+        glob: async function (pattern, opts) {
+          return patternList[pattern].map((path) => ({
+            fullpath () { return path },
+            mtime: mg[path]
+          }))
         }
       }
 

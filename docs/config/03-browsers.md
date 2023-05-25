@@ -107,11 +107,6 @@ $ export CHROME_CANARY_BIN=/usr/local/bin/my-chrome-build
 $ export PHANTOMJS_BIN=$HOME/local/bin/phantomjs
 ```
 
-### Windows cmd.exe
-```bash
-C:> SET IE_BIN=C:\Program Files\Internet Explorer\iexplore.exe
-```
-
 ### Windows Powershell
 ```bash
 $Env:FIREFOX_BIN = 'c:\Program Files (x86)\Mozilla Firefox 4.0 Beta 6\firefox.exe'
@@ -134,7 +129,6 @@ The browser scripts need to take one argument, which is the URL with the ID-para
 [JSDOM]: https://github.com/badeball/karma-jsdom-launcher
 [Firefox]: https://github.com/karma-runner/karma-firefox-launcher
 [Safari]: https://github.com/karma-runner/karma-safari-launcher
-[IE]: https://github.com/karma-runner/karma-ie-launcher
 [Opera]: https://github.com/karma-runner/karma-opera-launcher
 [SauceLabs]: https://github.com/karma-runner/karma-sauce-launcher
 [BrowserStack]: https://github.com/karma-runner/karma-browserstack-launcher
