@@ -22,20 +22,6 @@ const launchers = {
     browser: 'Safari',
     os: 'OS X',
     os_version: 'Big Sur'
-  },
-  bs_ie: {
-    base: 'BrowserStack',
-    browser: 'IE',
-    browser_version: '11.0',
-    os: 'Windows',
-    os_version: '10'
-  },
-  bs_ie9: {
-    base: 'BrowserStack',
-    browser: 'IE',
-    browser_version: '9.0',
-    os: 'Windows',
-    os_version: '7'
   }
 }
 
@@ -93,7 +79,6 @@ module.exports = function (config) {
     // - Opera
     // - Safari (only Mac)
     // - PhantomJS
-    // - IE (only Windows)
     // CLI --browsers Chrome,Firefox,Safari
     browsers: useBrowserStack ? Object.keys(launchers) : ['ChromeHeadless'],
 

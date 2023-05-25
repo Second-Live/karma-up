@@ -4,13 +4,9 @@ var assert = require('assert')
 var stringify = require('../../common/stringify')
 
 describe('stringify', function () {
-  if (window && window.Symbol) {
-    // IE does not support Symbol
-    // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Symbol
-    it('should serialize symbols', function () {
-      assert.deepStrictEqual(stringify(Symbol.for('x')), 'Symbol(x)')
-    })
-  }
+  it('should serialize symbols', function () {
+    assert.deepStrictEqual(stringify(Symbol.for('x')), 'Symbol(x)')
+  })
 
   it('should serialize string', function () {
     assert.deepStrictEqual(stringify('aaa'), "'aaa'")
@@ -74,9 +70,8 @@ describe('stringify', function () {
 
     obj = { constructor: null }
 
-    // IE 7 serializes this to Object{}
     var s = stringify(obj)
-    assert(s.indexOf('{constructor: null}') > -1 || s.indexOf('Object{}') > -1)
+    assert(s.indexOf('{constructor: null}') > -1)
 
     obj = Object.create(null)
     obj.a = 'a'
@@ -99,12 +94,9 @@ describe('stringify', function () {
   })
 
   it('should serialize DOMParser objects', function () {
-    if (typeof DOMParser !== 'undefined') {
-      // Test only works in IE 9 and above
       var parser = new DOMParser()
       var doc = parser.parseFromString('<test></test>', 'application/xml')
       assert.deepStrictEqual(stringify(doc), '<test></test>')
-    }
   })
 
   it('should serialize across iframes', function () {
