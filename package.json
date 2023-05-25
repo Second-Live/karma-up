@@ -1,13 +1,13 @@
 {
-  "name": "karma",
+  "name": "karma-up",
   "description": "Spectacular Test Runner for JavaScript.",
-  "homepage": "https://karma-runner.github.io/",
+  "homepage": "https://github.com/Second-Live/karma-up",
   "repository": {
     "type": "git",
-    "url": "git://github.com/karma-runner/karma.git"
+    "url": "git@github.com:Second-Live/karma-up.git"
   },
   "bugs": {
-    "url": "https://github.com/karma-runner/karma/issues"
+    "url": "https://github.com/Second-Live/karma-up/issues"
   },
   "keywords": [
     "karma",
