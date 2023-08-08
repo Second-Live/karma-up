@@ -94,9 +94,9 @@ describe('stringify', function () {
   })
 
   it('should serialize DOMParser objects', function () {
-      var parser = new DOMParser()
-      var doc = parser.parseFromString('<test></test>', 'application/xml')
-      assert.deepStrictEqual(stringify(doc), '<test></test>')
+    var parser = new DOMParser()
+    var doc = parser.parseFromString('<test></test>', 'application/xml')
+    assert.deepStrictEqual(stringify(doc), '<test></test>')
   })
 
   it('should serialize across iframes', function () {
