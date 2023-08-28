@@ -8,7 +8,7 @@ tasks
 docs
 client
 logo
-integration-tests
+karma-integration-tests
 
 TODO.md
 CONTRIBUTING.md

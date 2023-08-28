@@ -12,14 +12,14 @@ Feature: CLI
       Run --help with particular command to see its description and available options.
 
       Usage:
-        karma <command>
+        karma-up <command>
 
       Commands:
-        karma init [configFile]   Initialize a config file.
-        karma start [configFile]  Start the server / do a single run.
-        karma run [configFile]    Trigger a test run.
-        karma stop [configFile]   Stop the server.
-        karma completion          Shell completion for karma.
+        karma-up init [configFile]   Initialize a config file.
+        karma-up start [configFile]  Start the server / do a single run.
+        karma-up run [configFile]    Trigger a test run.
+        karma-up stop [configFile]   Stop the server.
+        karma-up completion          Shell completion for karma.
 
       Options:
         --help     Print usage and options.                                  [boolean]
@@ -42,14 +42,14 @@ Feature: CLI
       Run --help with particular command to see its description and available options.
 
       Usage:
-        karma <command>
+        karma-up <command>
 
       Commands:
-        karma init [configFile]   Initialize a config file.
-        karma start [configFile]  Start the server / do a single run.
-        karma run [configFile]    Trigger a test run.
-        karma stop [configFile]   Stop the server.
-        karma completion          Shell completion for karma.
+        karma-up init [configFile]   Initialize a config file.
+        karma-up start [configFile]  Start the server / do a single run.
+        karma-up run [configFile]    Trigger a test run.
+        karma-up stop [configFile]   Stop the server.
+        karma-up completion          Shell completion for karma.
 
       Options:
         --help     Print usage and options.                                  [boolean]
@@ -84,7 +84,7 @@ Feature: CLI
       INIT - Initialize a config file.
 
       Usage:
-        karma init [configFile]
+        karma-up init [configFile]
 
       Positionals:
         configFile  Name of the generated Karma configuration file            [string]
@@ -105,7 +105,7 @@ Feature: CLI
       START - Start the server / do a single run.
 
       Usage:
-        karma start [configFile]
+        karma-up start [configFile]
 
       Positionals:
         configFile  Path to the Karma configuration file                      [string]
@@ -148,7 +148,7 @@ Feature: CLI
       RUN - Run the tests (requires running server).
 
       Usage:
-        karma run [configFile] [-- <clientArgs>]
+        karma-up run [configFile] [-- <clientArgs>]
 
       Positionals:
         configFile  Path to the Karma configuration file                      [string]
@@ -184,7 +184,7 @@ Feature: CLI
       STOP - Stop the server (requires running server).
 
       Usage:
-        karma stop [configFile]
+        karma-up stop [configFile]
 
       Positionals:
         configFile  Path to the Karma configuration file                      [string]
@@ -204,7 +204,7 @@ Feature: CLI
       COMPLETION - Bash/ZSH completion for karma.
 
       Installation:
-        karma completion >> ~/.bashrc
+        karma-up completion >> ~/.bashrc
 
       Options:
         --help  Print usage and options.                                     [boolean]
