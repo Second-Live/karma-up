@@ -34,7 +34,7 @@ class World {
      * Absolute path to the Karma executable.
      * @type {string}
      */
-    this.karmaExecutable = fs.realpathSync(path.join(__dirname, '../../../bin/karma'))
+    this.karmaExecutable = fs.realpathSync(path.join(__dirname, '../../../bin/karma-up'))
 
     this.config = {
       singleRun: true,

@@ -65,7 +65,7 @@
     "eslint-plugin-promise": "^4.2.1",
     "eslint-plugin-standard": "^4.0.1",
     "jasmine-core": "^3.6.0",
-    "karma": ".",
+    "karma-up": ".",
     "karma-browserify": "^7.0.0",
     "karma-browserstack-launcher": "^1.6.0",
     "karma-chai": "^0.1.0",
@@ -90,7 +90,7 @@
   },
   "main": "./lib/index",
   "bin": {
-    "karma": "./bin/karma"
+    "karma-up": "./bin/karma-up"
   },
   "engines": {
     "node": ">= 16"
@@ -103,7 +103,7 @@
     "commit:check": "commitlint --from HEAD~1",
     "test:unit": "mocha \"test/unit/**/*.spec.js\"",
     "test:e2e": "cucumber-js test/e2e/*.feature",
-    "test:client": "node bin/karma start test/client/karma.conf.js",
+    "test:client": "node bin/karma-up start test/client/karma.conf.js",
     "test": "npm run test:unit && npm run test:e2e && npm run test:client",
     "build": "node scripts/client.js build",
     "build:check": "node scripts/client.js check",
