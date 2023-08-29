@@ -27,10 +27,10 @@ describe('middleware.karma', () => {
   const fsMock = mocks.fs.create({
     karma: {
       static: {
-        'client.html': mocks.fs.file(0, 'CLIENT HTML%X_UA_COMPATIBLE%%X_UA_COMPATIBLE_URL%'),
+        'client.html': mocks.fs.file(0, 'CLIENT HTML'),
         'client_with_context.html': mocks.fs.file(0, 'CLIENT_WITH_CONTEXT\n%SCRIPT_URL_ARRAY%'),
         'context.html': mocks.fs.file(0, 'CONTEXT\n%SCRIPTS%'),
-        'debug.html': mocks.fs.file(0, 'DEBUG\n%SCRIPTS%%X_UA_COMPATIBLE%'),
+        'debug.html': mocks.fs.file(0, 'DEBUG\n%SCRIPTS%'),
         'karma.js': mocks.fs.file(0, 'root: %KARMA_URL_ROOT%, proxy: %KARMA_PROXY_PATH%, v: %KARMA_VERSION%')
       }
     }
@@ -156,37 +156,6 @@ describe('middleware.karma', () => {
     })
 
     callHandlerWith('/?id=123')
-  })
-
-  it('should serve /?x-ua-compatible with replaced values', (done) => {
-    handler = createKarmaMiddleware(
-      null,
-      serveFile,
-      null,
-      injector,
-      '/base',
-      '/'
-    )
-
-    response.once('end', () => {
-      expect(nextSpy).not.to.have.been.called
-      expect(response).to.beServedAs(200, 'CLIENT HTML<meta http-equiv="X-UA-Compatible" content="xxx=yyy"/>?x-ua-compatible=xxx%3Dyyy')
-      done()
-    })
-
-    callHandlerWith('/?x-ua-compatible=xxx%3Dyyy')
-  })
-
-  it('should serve debug.html/?x-ua-compatible with replaced values', (done) => {
-    includedFiles([])
-
-    response.once('end', () => {
-      expect(nextSpy).not.to.have.been.called
-      expect(response).to.beServedAs(200, 'DEBUG\n<meta http-equiv="X-UA-Compatible" content="xxx=yyy"/>')
-      done()
-    })
-
-    callHandlerWith('/__karma__/debug.html?x-ua-compatible=xxx%3Dyyy')
   })
 
   it('should serve karma.js with version and urlRoot constiables', (done) => {
