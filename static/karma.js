@@ -353,7 +353,8 @@ var socket = io(location.host, {
   timeout: BROWSER_SOCKET_TIMEOUT,
   path: KARMA_PROXY_PATH + KARMA_URL_ROOT.slice(1) + 'socket.io',
   'sync disconnect on unload': true,
-  useNativeTimers: true
+  useNativeTimers: true,
+  closeOnBeforeunload: true
 })
 
 // instantiate the updater of the view
@@ -580,7 +581,7 @@ exports.parseQueryParams = function (locationSearch) {
 }
 
 },{}],7:[function(require,module,exports){
-(function (global){
+(function (global){(function (){
 
 var NativeCustomEvent = global.CustomEvent;
 
@@ -630,7 +631,7 @@ function CustomEvent (type, params) {
   return e;
 }
 
-}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+}).call(this)}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{}],8:[function(require,module,exports){
 
 /**
@@ -2340,7 +2341,7 @@ module.exports = function extend() {
 };
 
 },{}],12:[function(require,module,exports){
-(function (global){
+(function (global){(function (){
 /*! https://mths.be/punycode v1.4.1 by @mathias */
 ;(function(root) {
 
@@ -2875,7 +2876,7 @@ module.exports = function extend() {
 
 }(this));
 
-}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+}).call(this)}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{}],13:[function(require,module,exports){
 /**
  * This file automatically generated from `pre-publish.js`.

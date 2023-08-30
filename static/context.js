@@ -321,7 +321,7 @@ if (!haveParentAccess) {
 window.__karma__ = new ContextKarma(callParentKarmaMethod)
 
 },{"./karma":3}],5:[function(require,module,exports){
-(function (global){
+(function (global){(function (){
 
 var NativeCustomEvent = global.CustomEvent;
 
@@ -371,7 +371,7 @@ function CustomEvent (type, params) {
   return e;
 }
 
-}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+}).call(this)}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{}],6:[function(require,module,exports){
 
 /**
@@ -2081,7 +2081,7 @@ module.exports = function extend() {
 };
 
 },{}],10:[function(require,module,exports){
-(function (global){
+(function (global){(function (){
 /*! https://mths.be/punycode v1.4.1 by @mathias */
 ;(function(root) {
 
@@ -2616,7 +2616,7 @@ module.exports = function extend() {
 
 }(this));
 
-}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+}).call(this)}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{}],11:[function(require,module,exports){
 /**
  * This file automatically generated from `pre-publish.js`.
