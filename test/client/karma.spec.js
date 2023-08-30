@@ -80,8 +80,8 @@ describe('Karma', function () {
     var config = { clientDisplayNone: true }
     socket.emit('execute', config)
     setTimeout(function nextEventLoop () {
-      assert(elements[0].style.display === 'none')
-      assert(elements[1].style.display === 'none')
+      assert(elements[0].hidden === true)
+      assert(elements[1].hidden === true)
       done()
     })
   })

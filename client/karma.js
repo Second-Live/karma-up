@@ -1,18 +1,17 @@
-var stringify = require('../common/stringify')
-var constant = require('./constants')
-var util = require('../common/util')
+const stringify = require('../common/stringify')
+const constant = require('./constants')
+const util = require('../common/util')
 
 function Karma (updater, socket, iframe, opener, navigator, location, document) {
   this.updater = updater
-  var startEmitted = false
-  var self = this
-  var queryParams = util.parseQueryParams(location.search)
-  var browserId = queryParams.id || util.generateId('manual-')
-  var displayName = queryParams.displayName
-  var returnUrl = queryParams['return_url' + ''] || null
+  let startEmitted = false
+  const queryParams = new URLSearchParams(location.search)
+  const browserId = queryParams.get('id') || util.generateId('manual-')
+  const displayName = queryParams.get('displayName')
+  const returnUrl = queryParams.get('return_url')
 
-  var resultsBufferLimit = 50
-  var resultsBuffer = []
+  let resultsBufferLimit = 50
+  let resultsBuffer = []
 
   // This is a no-op if not running with a Trusted Types CSP policy, and
   // lets tests declare that they trust the way that karma creates and handles
@@ -20,15 +19,15 @@ function Karma (updater, socket, iframe, opener, navigator, location, document) 
   //
   // More info about the proposed Trusted Types standard at
   // https://github.com/WICG/trusted-types
-  var policy = {
-    createURL: function (s) {
+  let policy = {
+    createURL (s) {
       return s
     },
-    createScriptURL: function (s) {
+    createScriptURL (s) {
       return s
     }
   }
-  var trustedTypes = window.trustedTypes || window.TrustedTypes
+  const trustedTypes = window.trustedTypes || window.TrustedTypes
   if (trustedTypes) {
     policy = trustedTypes.createPolicy('karma', policy)
     if (!policy.createURL) {
@@ -46,7 +45,7 @@ function Karma (updater, socket, iframe, opener, navigator, location, document) 
   // second 'connect' event. There we will pass 'true' and that will be passed to the
   // Karma server then, so that Karma can differentiate between a socket client
   // econnect and a full browser reconnect.
-  var socketReconnect = false
+  let socketReconnect = false
 
   this.VERSION = constant.VERSION
   this.config = {}
@@ -58,33 +57,31 @@ function Karma (updater, socket, iframe, opener, navigator, location, document) 
   // Set up postMessage bindings for current window
   // DEV: These are to allow windows in separate processes execute local tasks
   //   Electron is one of these environments
-  if (window.addEventListener) {
-    window.addEventListener('message', function handleMessage (evt) {
-      // Resolve the origin of our message
-      var origin = evt.origin || evt.originalEvent.origin
+  window.addEventListener('message', (evt) => {
+    // Resolve the origin of our message
+    const origin = evt.origin || evt.originalEvent.origin
 
-      // If the message isn't from our host, then reject it
-      if (origin !== window.location.origin) {
+    // If the message isn't from our host, then reject it
+    if (origin !== window.location.origin) {
+      return
+    }
+
+    // Take action based on the message type
+    const method = evt.data.__karmaMethod
+    if (method) {
+      if (!this[method]) {
+        this.error('Received `postMessage` for "' + method + '" but the method doesn\'t exist')
         return
       }
+      this[method].apply(this, evt.data.__karmaArguments)
+    }
+  }, false)
 
-      // Take action based on the message type
-      var method = evt.data.__karmaMethod
-      if (method) {
-        if (!self[method]) {
-          self.error('Received `postMessage` for "' + method + '" but the method doesn\'t exist')
-          return
-        }
-        self[method].apply(self, evt.data.__karmaArguments)
-      }
-    }, false)
-  }
-
-  var childWindow = null
-  function navigateContextTo (url) {
-    if (self.config.useIframe === false) {
+  let childWindow = null
+  const navigateContextTo = (url) => {
+    if (this.config.useIframe === false) {
       // run in new window
-      if (self.config.runInParent === false) {
+      if (this.config.runInParent === false) {
         // If there is a window already open, then close it
         // DEV: In some environments (e.g. Electron), we don't have setter access for location
         if (childWindow !== null && childWindow.closed !== true) {
@@ -95,25 +92,25 @@ function Karma (updater, socket, iframe, opener, navigator, location, document) 
         }
         childWindow = opener(url)
         if (childWindow === null) {
-          self.error('Opening a new tab/window failed, probably because pop-ups are blocked.')
+          this.error('Opening a new tab/window failed, probably because pop-ups are blocked.')
         }
       // run context on parent element (client_with_context)
       // using window.__karma__.scriptUrls to get the html element strings and load them dynamically
       } else if (url !== 'about:blank') {
-        var loadScript = function (idx) {
+        const loadScript = function (idx) {
           if (idx < window.__karma__.scriptUrls.length) {
-            var parser = new DOMParser()
+            const parser = new DOMParser()
             // Revert escaped characters with special roles in HTML before parsing
-            var string = window.__karma__.scriptUrls[idx]
+            const string = window.__karma__.scriptUrls[idx]
               .replace(/\\x3C/g, '<')
               .replace(/\\x3E/g, '>')
-            var doc = parser.parseFromString(string, 'text/html')
-            var ele = doc.head.firstChild || doc.body.firstChild
+            const doc = parser.parseFromString(string, 'text/html')
+            let ele = doc.head.firstChild || doc.body.firstChild
             // script elements created by DomParser are marked as unexecutable,
             // create a new script element manually and copy necessary properties
             // so it is executable
             if (ele.tagName && ele.tagName.toLowerCase() === 'script') {
-              var tmp = ele
+              const tmp = ele
               ele = document.createElement('script')
               ele.src = policy.createScriptURL(tmp.src)
               ele.crossOrigin = tmp.crossOrigin
@@ -138,19 +135,14 @@ function Karma (updater, socket, iframe, opener, navigator, location, document) 
   }
 
   this.log = function (type, args) {
-    var values = []
-
-    for (var i = 0; i < args.length; i++) {
-      values.push(this.stringify(args[i], 3))
-    }
-
-    this.info({ log: values.join(', '), type: type })
+    const values = args.map((v) => this.stringify(v, 3))
+    this.info({ log: values.join(', '), type })
   }
 
   this.stringify = stringify
 
   function getLocation (url, lineno, colno) {
-    var location = ''
+    let location = ''
 
     if (url !== undefined) {
       location += url
@@ -170,11 +162,11 @@ function Karma (updater, socket, iframe, opener, navigator, location, document) 
   // error during js file loading (most likely syntax error)
   // we are not going to execute at all. `window.onerror` callback.
   this.error = function (messageOrEvent, source, lineno, colno, error) {
-    var message
+    let message
     if (typeof messageOrEvent === 'string') {
       message = messageOrEvent
 
-      var location = getLocation(source, lineno, colno)
+      const location = getLocation(source, lineno, colno)
       if (location !== '') {
         message += '\nat ' + location
       }
@@ -188,21 +180,21 @@ function Karma (updater, socket, iframe, opener, navigator, location, document) 
     }
 
     socket.emit('karma_error', message)
-    self.updater.updateTestStatus('karma_error ' + message)
+    this.updater.updateTestStatus('karma_error ' + message)
     this.complete()
     return false
   }
 
   this.result = function (originalResult) {
-    var convertedResult = {}
+    const convertedResult = {}
 
     // Convert all array-like objects to real arrays.
-    for (var propertyName in originalResult) {
-      if (Object.prototype.hasOwnProperty.call(originalResult, propertyName)) {
-        var propertyValue = originalResult[propertyName]
+    for (const propertyName in originalResult) {
+      if (Object.hasOwn(originalResult, propertyName)) {
+        const propertyValue = originalResult[propertyName]
 
-        if (Object.prototype.toString.call(propertyValue) === '[object Array]') {
-          convertedResult[propertyName] = Array.prototype.slice.call(propertyValue)
+        if (Array.isArray(propertyValue)) {
+          convertedResult[propertyName] = [...propertyValue]
         } else {
           convertedResult[propertyName] = propertyValue
         }
@@ -211,12 +203,12 @@ function Karma (updater, socket, iframe, opener, navigator, location, document) 
 
     if (!startEmitted) {
       socket.emit('start', { total: null })
-      self.updater.updateTestStatus('start')
+      this.updater.updateTestStatus('start')
       startEmitted = true
     }
 
     if (resultsBufferLimit === 1) {
-      self.updater.updateTestStatus('result')
+      this.updater.updateTestStatus('result')
       return socket.emit('result', convertedResult)
     }
 
@@ -224,7 +216,7 @@ function Karma (updater, socket, iframe, opener, navigator, location, document) 
 
     if (resultsBuffer.length === resultsBufferLimit) {
       socket.emit('result', resultsBuffer)
-      self.updater.updateTestStatus('result')
+      this.updater.updateTestStatus('result')
       resultsBuffer = []
     }
   }
@@ -239,12 +231,12 @@ function Karma (updater, socket, iframe, opener, navigator, location, document) 
     if (this.config.clearContext) {
       navigateContextTo('about:blank')
     } else {
-      self.updater.updateTestStatus('complete')
+      this.updater.updateTestStatus('complete')
     }
     if (returnUrl) {
-      var isReturnUrlAllowed = false
-      for (var i = 0; i < this.config.allowedReturnUrlPatterns.length; i++) {
-        var allowedReturnUrlPattern = new RegExp(this.config.allowedReturnUrlPatterns[i])
+      let isReturnUrlAllowed = false
+      for (let i = 0; i < this.config.allowedReturnUrlPatterns.length; i++) {
+        const allowedReturnUrlPattern = new RegExp(this.config.allowedReturnUrlPatterns[i])
         if (allowedReturnUrlPattern.test(returnUrl)) {
           isReturnUrlAllowed = true
           break
@@ -272,18 +264,16 @@ function Karma (updater, socket, iframe, opener, navigator, location, document) 
     }
   }
 
-  socket.on('execute', function (cfg) {
-    self.updater.updateTestStatus('execute')
+  socket.on('execute', (cfg) => {
+    this.updater.updateTestStatus('execute')
     // reset startEmitted and reload the iframe
     startEmitted = false
-    self.config = cfg
+    this.config = cfg
 
     navigateContextTo(constant.CONTEXT_URL)
 
-    if (self.config.clientDisplayNone) {
-      [].forEach.call(document.querySelectorAll('#banner, #browsers'), function (el) {
-        el.style.display = 'none'
-      })
+    if (this.config.clientDisplayNone) {
+      [].forEach.call(document.querySelectorAll('#banner, #browsers'), (el) => { el.hidden = true })
     }
 
     // clear the console before run
@@ -292,9 +282,7 @@ function Karma (updater, socket, iframe, opener, navigator, location, document) 
       window.console.clear()
     }
   })
-  socket.on('stop', function () {
-    this.complete()
-  }.bind(this))
+  socket.on('stop', () => this.complete())
 
   // Report the browser name and Id. Note that this event can also fire if the connection has
   // been temporarily lost, but the socket reconnected automatically. Read more in the docs:
@@ -308,7 +296,7 @@ function Karma (updater, socket, iframe, opener, navigator, location, document) 
         resultsBuffer = []
       }
     })
-    var info = {
+    const info = {
       name: navigator.userAgent,
       id: browserId,
       isSocketReconnect: socketReconnect
