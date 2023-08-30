@@ -2,7 +2,7 @@ const { exec, spawn } = require('child_process')
 const fs = require('fs')
 const vm = require('vm')
 const path = require('path')
-const mkdirp = require('mkdirp')
+const { mkdirSync } = require('fs')
 const rimraf = require('rimraf')
 const { setWorldConstructor } = require('cucumber')
 const Proxy = require('./proxy')
@@ -91,7 +91,7 @@ module.exports = (config) => {
 
   ensureSandbox () {
     rimraf.sync(this.sandboxDir)
-    mkdirp.sync(this.sandboxDir)
+    mkdirSync(this.sandboxDir, { recursive: true })
   }
 
   async runBackgroundProcess (args, readyOutput = null) {
