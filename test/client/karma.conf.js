@@ -21,7 +21,7 @@ const launchers = {
     base: 'BrowserStack',
     browser: 'Safari',
     os: 'OS X',
-    os_version: 'Big Sur'
+    os_version: 'Monterey'
   }
 }
 
