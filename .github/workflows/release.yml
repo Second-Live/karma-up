@@ -1,9 +1,7 @@
 name: Release
 
 on:
-  push:
-    branches:
-      - master
+  workflow_dispatch:
 
 jobs:
   main:
@@ -15,12 +13,9 @@ jobs:
       SAUCE_USERNAME: ${{ secrets.SAUCE_USERNAME }}
       SAUCE_ACCESS_KEY: ${{ secrets.SAUCE_ACCESS_KEY }}
       NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-      GITHUB_TOKEN: ${{ secrets.KARMARUNNERBOT_GITHUB_TOKEN }}
       KARMA_TEST_NO_FALLBACK: 1
     steps:
       - uses: actions/checkout@v3
-        with:
-          token: ${{ env.GITHUB_TOKEN }}
       - uses: actions/setup-node@v3
         with:
           node-version: 16

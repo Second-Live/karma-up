@@ -1,14 +1,12 @@
 module.exports = {
   // Add logging for releases until we are fully confident of the release solution.
   debug: true,
-  branches: 'master',
   verifyConditions: [
     '@semantic-release/changelog',
     '@semantic-release/npm',
     '@semantic-release/github'
   ],
   prepare: [
-    './tools/update-contributors',
     '@semantic-release/changelog',
     '@semantic-release/npm',
     '@semantic-release/git'
@@ -18,8 +16,7 @@ module.exports = {
     '@semantic-release/github'
   ],
   success: [
-    '@semantic-release/github',
-    './tools/update-docs'
+    '@semantic-release/github'
   ],
 
   // The release rules determine what kind of release should be triggered
