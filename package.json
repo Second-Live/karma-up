@@ -90,7 +90,7 @@
     "karma-up": "./bin/karma-up"
   },
   "engines": {
-    "node": ">= 16"
+    "node": ">= 18"
   },
   "version": "6.4.2",
   "license": "MIT",
@@ -112,6 +112,8 @@
   "mocha": {
     "reporter": "dot",
     "ui": "bdd",
-    "require": ["test/unit/mocha-globals.js"]
+    "require": [
+      "test/unit/mocha-globals.js"
+    ]
   }
 }
