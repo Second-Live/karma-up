@@ -1,3 +1,34 @@
+# [7.0.0-alpha.1](https://github.com/Second-Live/karma-up/compare/v6.4.2...v7.0.0-alpha.1) (2023-09-19)
+
+
+### Bug Fixes
+
+* eslint rules ([afb466d](https://github.com/Second-Live/karma-up/commit/afb466dfd6c7f6a269dbf4eefd12ee548305880f))
+* upgrade and set socket.io closeOnBeforeunload option to true ([d533a22](https://github.com/Second-Live/karma-up/commit/d533a228a9586c79a03353bfb3d36eedd5c16ae5))
+
+
+### chore
+
+* drop Node 10, 12, 14 ([01f265f](https://github.com/Second-Live/karma-up/commit/01f265f6c9974ca3a11a336b8a27909eb2649210))
+
+
+### Continuous Integration
+
+* drop Node 16 ([747c20a](https://github.com/Second-Live/karma-up/commit/747c20a5dbe6874aeec4e6637dfce1fa5f5991a6))
+
+
+### Features
+
+* drop IE support ([a832dd5](https://github.com/Second-Live/karma-up/commit/a832dd57a62a22788cd30533b5a07ba6b89159fd))
+* udpate glob to last version ([fdac871](https://github.com/Second-Live/karma-up/commit/fdac8711411d53a2869906bf3828fe5533151c7b))
+
+
+### BREAKING CHANGES
+
+* Drop not supported Node js version 16
+* Drop IE Support
+* Drop not supported Node js versions 10,12,14
+
 ## [6.4.2](https://github.com/karma-runner/karma/compare/v6.4.1...v6.4.2) (2023-04-21)
 
 
