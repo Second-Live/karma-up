@@ -2,6 +2,9 @@ name: Release
 
 on: workflow_dispatch
 
+permissions:
+  contents: write
+
 jobs:
   main:
     name: Test, Tag Commit and Release to NPM
@@ -12,6 +15,7 @@ jobs:
       SAUCE_USERNAME: ${{ secrets.SAUCE_USERNAME }}
       SAUCE_ACCESS_KEY: ${{ secrets.SAUCE_ACCESS_KEY }}
       NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+      GITHUB_TOKEN: ${{ github.token }}
       KARMA_TEST_NO_FALLBACK: 1
     steps:
       - uses: actions/checkout@v3
