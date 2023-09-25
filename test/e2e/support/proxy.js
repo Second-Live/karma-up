@@ -8,7 +8,11 @@ module.exports = class Proxy {
     this.proxyPathRegExp = null
 
     this.proxy = httpProxy.createProxyServer({
-      target: 'http://127.0.0.1:9876'
+      target: {
+        host: '127.0.0.1',
+        port: 9876
+      },
+      ws: true
     })
 
     this.proxy.on('error', (err) => {
@@ -25,6 +29,15 @@ module.exports = class Proxy {
         res.statusCode = 404
         res.statusMessage = 'Not found'
         res.end()
+      }
+    })
+
+    this.server.on('upgrade', (req, socket, head) => {
+      const url = req.url
+      const match = url.match(this.proxyPathRegExp)
+      if (match) {
+        req.url = '/' + match[1]
+        this.proxy.ws(req, socket, head)
       }
     })
 

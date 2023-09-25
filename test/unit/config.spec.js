@@ -343,7 +343,7 @@ describe('config', () => {
 
       config = normalizeConfigWithDefaults({ upstreamProxy: {} })
       expect(config.upstreamProxy.path).to.equal('/')
-      expect(config.upstreamProxy.hostname).to.equal('localhost')
+      expect(config.upstreamProxy.hostname).to.equal('127.0.0.1')
       expect(config.upstreamProxy.port).to.equal(9875)
       expect(config.upstreamProxy.protocol).to.equal('http:')
 

@@ -20,9 +20,6 @@ function Karma (updater, socket, iframe, opener, navigator, location, document) 
   const displayName = queryParams.get('displayName')
   const returnUrl = queryParams.get('return_url')
 
-  let resultsBufferLimit = 50
-  let resultsBuffer = []
-
   // This is a no-op if not running with a Trusted Types CSP policy, and
   // lets tests declare that they trust the way that karma creates and handles
   // URLs.
@@ -217,26 +214,11 @@ function Karma (updater, socket, iframe, opener, navigator, location, document) 
       startEmitted = true
     }
 
-    if (resultsBufferLimit === 1) {
-      this.updater.updateTestStatus('result')
-      return socket.emit('result', convertedResult)
-    }
-
-    resultsBuffer.push(convertedResult)
-
-    if (resultsBuffer.length === resultsBufferLimit) {
-      socket.emit('result', resultsBuffer)
-      this.updater.updateTestStatus('result')
-      resultsBuffer = []
-    }
+    this.updater.updateTestStatus('result')
+    return socket.emit('result', convertedResult)
   }
 
   this.complete = function (result) {
-    if (resultsBuffer.length) {
-      socket.emit('result', resultsBuffer)
-      resultsBuffer = []
-    }
-
     socket.emit('complete', result || {})
     if (this.config.clearContext) {
       navigateContextTo('about:blank')
@@ -298,14 +280,6 @@ function Karma (updater, socket, iframe, opener, navigator, location, document) 
   // been temporarily lost, but the socket reconnected automatically. Read more in the docs:
   // https://socket.io/docs/client-api/#Event-%E2%80%98connect%E2%80%99
   socket.on('connect', function () {
-    socket.io.engine.on('upgrade', function () {
-      resultsBufferLimit = 1
-      // Flush any results which were buffered before the upgrade to WebSocket protocol.
-      if (resultsBuffer.length > 0) {
-        socket.emit('result', resultsBuffer)
-        resultsBuffer = []
-      }
-    })
     const info = {
       name: navigator.userAgent,
       id: browserId,
@@ -339,6 +313,7 @@ const socket = io(location.host, {
   reconnectionDelay: 500,
   reconnectionDelayMax: Infinity,
   timeout: BROWSER_SOCKET_TIMEOUT,
+  transports: ['websocket', 'webtransport'],
   path: KARMA_PROXY_PATH + KARMA_URL_ROOT.slice(1) + 'socket.io',
   'sync disconnect on unload': true,
   useNativeTimers: true,
