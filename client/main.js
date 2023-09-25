@@ -15,6 +15,7 @@ const socket = io(location.host, {
   reconnectionDelay: 500,
   reconnectionDelayMax: Infinity,
   timeout: BROWSER_SOCKET_TIMEOUT,
+  transports: ["websocket", "webtransport"],
   path: KARMA_PROXY_PATH + KARMA_URL_ROOT.slice(1) + 'socket.io',
   'sync disconnect on unload': true,
   useNativeTimers: true,
