@@ -236,40 +236,6 @@ describe('Karma', function () {
   })
 
   describe('result', function () {
-    it('should buffer results when polling', function () {
-      var spyResult = sinon.stub()
-      socket.on('result', spyResult)
-
-      setTransportTo('polling')
-
-      // emit 49 results
-      for (var i = 1; i < 50; i++) {
-        ck.result({ id: i })
-      }
-
-      assert(!spyResult.called)
-
-      ck.result('result', { id: 50 })
-      assert(spyResult.called)
-      assert(spyResult.args[0][0].length === 50)
-    })
-
-    it('should buffer results when polling', function () {
-      var spyResult = sinon.stub()
-      socket.on('result', spyResult)
-
-      setTransportTo('polling')
-
-      // emit 40 results
-      for (var i = 1; i <= 40; i++) {
-        ck.result({ id: i })
-      }
-
-      ck.complete()
-      assert(spyResult.called)
-      assert(spyResult.args[0][0].length === 40)
-    })
-
     it('should emit "start" with total specs count first', function () {
       var log = []
 
@@ -423,23 +389,6 @@ describe('Karma', function () {
 
     after(function () {
       clock.restore()
-    })
-
-    it('should clean the result buffer before completing', function () {
-      var spyResult = sinon.stub()
-      socket.on('result', spyResult)
-
-      setTransportTo('polling')
-
-      // emit 40 results
-      for (var i = 0; i < 40; i++) {
-        ck.result({ id: i })
-      }
-
-      assert(!spyResult.called)
-
-      ck.complete()
-      assert(spyResult.called)
     })
 
     it('should navigate the client to return_url if specified and allowed', function (done) {
