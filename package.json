@@ -29,7 +29,6 @@
     "chokidar": "^3.5.3",
     "connect": "^3.7.0",
     "di": "^0.0.1",
-    "dom-serialize": "^2.2.1",
     "glob": "^10.3.4",
     "graceful-fs": "^4.2.11",
     "http-proxy": "^1.18.1",
