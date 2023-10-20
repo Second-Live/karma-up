@@ -1,4 +1,3 @@
-
 console.log('foo')
 console.debug('bar')
 console.info('baz')

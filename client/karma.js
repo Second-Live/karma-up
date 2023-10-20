@@ -255,14 +255,10 @@ function Karma (updater, socket, iframe, opener, navigator, location, document) 
     navigateContextTo(constant.CONTEXT_URL)
 
     if (this.config.clientDisplayNone) {
-      [].forEach.call(document.querySelectorAll('#banner, #browsers'), (el) => { el.hidden = true })
+      document.querySelectorAll('#banner, #browsers').forEach((el) => (el.hidden = true))
     }
-
     // clear the console before run
-    // works only on FF (Safari, Chrome do not allow to clear console from js source)
-    if (window.console && window.console.clear) {
-      window.console.clear()
-    }
+    window.console.clear()
   })
   socket.on('stop', () => this.complete())
 
