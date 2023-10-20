@@ -160,8 +160,10 @@ Then(/^the file at ([a-zA-Z0-9/\\_.]+) contains:$/, function (filePath, expected
 })
 
 Then(/^the background (stdout|stderr) (is exactly|contains|matches RegExp):$/, async function (outputType, comparison, expectedOutput) {
-  const message = comparison === 'is exactly' ? 'Expected output to be exactly as above, but got:'
-    : comparison === 'contains' ? 'Expected output to contain the above text, but got:'
+  const message = comparison === 'is exactly'
+    ? 'Expected output to be exactly as above, but got:'
+    : comparison === 'contains'
+      ? 'Expected output to contain the above text, but got:'
       : 'Expected output to match the above RegExp, but got:'
 
   await waitForCondition(
