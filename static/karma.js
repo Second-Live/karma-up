@@ -27,7 +27,7 @@
   	}; 
   } (util$2));
 
-  var instanceOf = util$2.instanceOf;
+  const instanceOf = util$2.instanceOf;
 
   function isNode (obj) {
     return (obj.tagName || obj.nodeName) && obj.nodeType
@@ -64,11 +64,11 @@
         }
       case 'boolean':
         return obj ? 'true' : 'false'
-      case 'object':
-        var strs = [];
+      case 'object': {
+        const strs = [];
         if (instanceOf(obj, 'Array')) {
           strs.push('[');
-          for (var i = 0, ii = obj.length; i < ii; i++) {
+          for (let i = 0, ii = obj.length; i < ii; i++) {
             if (i) {
               strs.push(', ');
             }
@@ -88,15 +88,15 @@
         } else if (instanceOf(obj, 'Error')) {
           return obj.toString() + '\n' + obj.stack
         } else {
-          var constructor = 'Object';
+          let constructor = 'Object';
           if (obj.constructor && typeof obj.constructor === 'function') {
             constructor = obj.constructor.name;
           }
 
           strs.push(constructor);
           strs.push('{');
-          var first = true;
-          for (var key in obj) {
+          let first = true;
+          for (const key in obj) {
             if (Object.prototype.hasOwnProperty.call(obj, key)) {
               if (first) {
                 first = false;
@@ -110,6 +110,7 @@
           strs.push('}');
         }
         return strs.join('')
+      }
       default:
         return obj
     }
@@ -296,6 +297,11 @@
         }
         if (error && error.stack) {
           message += '\n\n' + error.stack;
+        }
+      } else if (messageOrEvent?.type === 'unhandledrejection') {
+        message = messageOrEvent.reason.message;
+        if (messageOrEvent.reason.stack) {
+          message += '\n\n' + messageOrEvent.reason.stack;
         }
       } else {
         // create an object with the string representation of the message to

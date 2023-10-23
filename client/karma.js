@@ -170,6 +170,11 @@ function Karma (updater, socket, iframe, opener, navigator, location, document) 
       if (error && error.stack) {
         message += '\n\n' + error.stack
       }
+    } else if (messageOrEvent?.type === 'unhandledrejection') {
+      message = messageOrEvent.reason.message
+      if (messageOrEvent.reason.stack) {
+        message += '\n\n' + messageOrEvent.reason.stack
+      }
     } else {
       // create an object with the string representation of the message to
       // ensure all its content is properly transferred to the console log

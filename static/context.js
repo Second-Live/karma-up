@@ -27,7 +27,7 @@
   	}; 
   } (util));
 
-  var instanceOf = util.instanceOf;
+  const instanceOf = util.instanceOf;
 
   function isNode (obj) {
     return (obj.tagName || obj.nodeName) && obj.nodeType
@@ -64,11 +64,11 @@
         }
       case 'boolean':
         return obj ? 'true' : 'false'
-      case 'object':
-        var strs = [];
+      case 'object': {
+        const strs = [];
         if (instanceOf(obj, 'Array')) {
           strs.push('[');
-          for (var i = 0, ii = obj.length; i < ii; i++) {
+          for (let i = 0, ii = obj.length; i < ii; i++) {
             if (i) {
               strs.push(', ');
             }
@@ -88,15 +88,15 @@
         } else if (instanceOf(obj, 'Error')) {
           return obj.toString() + '\n' + obj.stack
         } else {
-          var constructor = 'Object';
+          let constructor = 'Object';
           if (obj.constructor && typeof obj.constructor === 'function') {
             constructor = obj.constructor.name;
           }
 
           strs.push(constructor);
           strs.push('{');
-          var first = true;
-          for (var key in obj) {
+          let first = true;
+          for (const key in obj) {
             if (Object.prototype.hasOwnProperty.call(obj, key)) {
               if (first) {
                 first = false;
@@ -110,6 +110,7 @@
           strs.push('}');
         }
         return strs.join('')
+      }
       default:
         return obj
     }
@@ -192,6 +193,8 @@
       contextWindow.onerror = (...args) => {
         return this.error(...args)
       };
+
+      contextWindow.onunhandledrejection = (event) => this.error(event);
 
       contextWindow.onbeforeunload = () => {
         return this.error('Some of your tests did a full page reload!')
