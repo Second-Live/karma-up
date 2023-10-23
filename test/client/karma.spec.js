@@ -1,5 +1,5 @@
 var sinon = require('sinon')
-var assert = require('assert')
+var assert = require('chai').assert
 
 var ClientKarma = require('../../client/karma')
 var ContextKarma = require('../../context/karma')
