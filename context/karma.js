@@ -74,6 +74,8 @@ class ContextKarma {
       return this.error(...args)
     }
 
+    contextWindow.onunhandledrejection = (event) => this.error(event)
+
     contextWindow.onbeforeunload = () => {
       return this.error('Some of your tests did a full page reload!')
     }
