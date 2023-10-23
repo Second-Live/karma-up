@@ -292,7 +292,7 @@ describe('middleware.runner', () => {
   })
 
   describe('', () => {
-    var clientArgsRuns = [
+    const clientArgsRuns = [
       {
         desc: 'should parse body and set client.args',
         expected: ['arg1', 'arg2'],
@@ -373,9 +373,9 @@ describe('middleware.runner', () => {
           done()
         })
 
-        var RAW_MESSAGE = run.rawMessage
+        const RAW_MESSAGE = run.rawMessage
 
-        var request = new HttpRequestMock('/__run__', {
+        const request = new HttpRequestMock('/__run__', {
           'content-type': 'application/json',
           'content-length': RAW_MESSAGE.length
         })

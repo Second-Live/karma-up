@@ -192,7 +192,7 @@ describe('server', () => {
   })
 
   describe('start on watch mode', () => {
-    var config
+    let config
     beforeEach(() => {
       config = { port: 9876, listenAddress: '127.0.0.1', singleRun: false }
       sinon.stub(NetUtils, 'bindAvailablePort').resolves(mockBoundServer)

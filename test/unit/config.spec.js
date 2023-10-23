@@ -67,8 +67,8 @@ describe('config', () => {
     m = loadFile(path.join(__dirname, '/../../lib/config.js'), mocks, {
       global: {},
       process: mocks.process,
-      Error: Error, // Without this, chai's `.throw()` assertion won't correctly check against constructors.
-      Promise: Promise,
+      Error, // Without this, chai's `.throw()` assertion won't correctly check against constructors.
+      Promise,
       require (path) {
         if (mockConfigs[path]) {
           return mockConfigs[path]
