@@ -1,13 +1,13 @@
-var sinon = require('sinon')
-var assert = require('chai').assert
+const sinon = require('sinon')
+const assert = require('chai').assert
 
-var ClientKarma = require('../../client/karma')
-var ContextKarma = require('../../context/karma')
-var MockSocket = require('./mocks').Socket
+const ClientKarma = require('../../client/karma')
+const ContextKarma = require('../../context/karma')
+const MockSocket = require('./mocks').Socket
 
 describe('Karma', function () {
-  var updater, socket, k, ck, windowNavigator, windowLocation, windowStub, startSpy, iframe, clientWindow
-  var windowDocument, elements, mockTestStatus
+  let updater, socket, k, ck, windowNavigator, windowLocation, windowStub, startSpy, iframe, clientWindow
+  let windowDocument, elements, mockTestStatus
 
   function setTransportTo (transportName) {
     socket._setTransportNameTo(transportName)
@@ -39,7 +39,7 @@ describe('Karma', function () {
   })
 
   it('should start execution when all files loaded and pass config', function () {
-    var config = ck.config = {
+    const config = ck.config = {
       useIframe: true
     }
 
@@ -51,7 +51,7 @@ describe('Karma', function () {
   })
 
   it('should open a new window when useIFrame is false', function (done) {
-    var config = ck.config = {
+    const config = ck.config = {
       useIframe: false,
       runInParent: false
     }
@@ -68,7 +68,7 @@ describe('Karma', function () {
   })
 
   it('should not set style on elements', function (done) {
-    var config = {}
+    const config = {}
     socket.emit('execute', config)
     setTimeout(function nextEventLoop () {
       assert(Object.keys(elements[0].style).length === 0)
@@ -77,7 +77,7 @@ describe('Karma', function () {
   })
 
   it('should set display none on elements if clientDisplayNone', function (done) {
-    var config = { clientDisplayNone: true }
+    const config = { clientDisplayNone: true }
     socket.emit('execute', config)
     setTimeout(function nextEventLoop () {
       assert(elements[0].hidden === true)
@@ -113,14 +113,14 @@ describe('Karma', function () {
   })
 
   it('should not set up context if there was an error', function (done) {
-    var config = ck.config = {
+    const config = ck.config = {
       clearContext: true
     }
 
     socket.emit('execute', config)
 
     setTimeout(function nextEventLoop () {
-      var mockWindow = {}
+      const mockWindow = {}
 
       ck.error('page reload')
       ck.setupContext(mockWindow)
@@ -132,14 +132,14 @@ describe('Karma', function () {
   })
 
   it('should setup context if there was error but clearContext config is false', function (done) {
-    var config = ck.config = {
+    const config = ck.config = {
       clearContext: false
     }
 
     socket.emit('execute', config)
 
     setTimeout(function nextEventLoop () {
-      var mockWindow = {}
+      const mockWindow = {}
 
       ck.error('page reload')
       ck.setupContext(mockWindow)
@@ -152,13 +152,13 @@ describe('Karma', function () {
 
   it('should error out if a script attempted to reload the browser after setup', function (done) {
     // Perform setup
-    var config = ck.config = {
+    const config = ck.config = {
       clearContext: false
     }
     socket.emit('execute', config)
 
     setTimeout(function nextEventLoop () {
-      var mockWindow = {}
+      const mockWindow = {}
       ck.setupContext(mockWindow)
 
       // Spy on our error handler
@@ -175,13 +175,13 @@ describe('Karma', function () {
 
   it('should error out if a script attempted to reload the browser after setup with clearContext true', function (done) {
     // Perform setup
-    var config = ck.config = {
+    const config = ck.config = {
       clearContext: true
     }
     socket.emit('execute', config)
 
     setTimeout(function nextEventLoop () {
-      var mockWindow = {}
+      const mockWindow = {}
       ck.setupContext(mockWindow)
 
       // Spy on our error handler
@@ -197,7 +197,7 @@ describe('Karma', function () {
   })
 
   it('should report navigator name', function () {
-    var spyInfo = sinon.spy(function (info) {
+    const spyInfo = sinon.spy(function (info) {
       assert(info.name === 'Fake browser name')
     })
 
@@ -225,7 +225,7 @@ describe('Karma', function () {
     socket = new MockSocket()
     k = new ClientKarma(updater, socket, {}, windowStub, windowNavigator, windowLocation)
 
-    var spyInfo = sinon.spy(function (info) {
+    const spyInfo = sinon.spy(function (info) {
       assert(info.id === '567')
     })
 
@@ -237,7 +237,7 @@ describe('Karma', function () {
 
   describe('result', function () {
     it('should emit "start" with total specs count first', function () {
-      var log = []
+      const log = []
 
       socket.on('result', function () {
         log.push('result')
@@ -255,13 +255,13 @@ describe('Karma', function () {
     })
 
     it('should not emit "start" if already done by the adapter', function () {
-      var log = []
+      const log = []
 
-      var spyStart = sinon.spy(function () {
+      const spyStart = sinon.spy(function () {
         log.push('start')
       })
 
-      var spyResult = sinon.spy(function () {
+      const spyResult = sinon.spy(function () {
         log.push('result')
       })
 
@@ -281,7 +281,7 @@ describe('Karma', function () {
     it('should capture alert', function () {
       sinon.spy(ck, 'log')
 
-      var mockWindow = {
+      const mockWindow = {
         alert: function () {
           throw new Error('Alert was not patched!')
         }
@@ -294,9 +294,9 @@ describe('Karma', function () {
 
     it('should capture confirm', function () {
       sinon.spy(ck, 'log')
-      var confirmCalled = false
+      let confirmCalled = false
 
-      var mockWindow = {
+      const mockWindow = {
         confirm: function () {
           confirmCalled = true
           return true
@@ -304,7 +304,7 @@ describe('Karma', function () {
       }
 
       ck.setupContext(mockWindow)
-      var confirmResult = mockWindow.confirm('What?')
+      const confirmResult = mockWindow.confirm('What?')
       assert(ck.log.calledWith('confirm', ['What?']))
       assert.strictEqual(confirmCalled, true)
       assert.strictEqual(confirmResult, true)
@@ -312,9 +312,9 @@ describe('Karma', function () {
 
     it('should capture prompt', function () {
       sinon.spy(ck, 'log')
-      var promptCalled = false
+      let promptCalled = false
 
-      var mockWindow = {
+      const mockWindow = {
         prompt: function () {
           promptCalled = true
           return 'user-input'
@@ -322,7 +322,7 @@ describe('Karma', function () {
       }
 
       ck.setupContext(mockWindow)
-      var promptResult = mockWindow.prompt('What is your favorite color?', 'blue')
+      const promptResult = mockWindow.prompt('What is your favorite color?', 'blue')
       assert(ck.log.calledWith('prompt', ['What is your favorite color?', 'blue']))
       assert.strictEqual(promptCalled, true)
       assert.strictEqual(promptResult, 'user-input')
@@ -332,7 +332,7 @@ describe('Karma', function () {
       sinon.spy(ck, 'log')
       ck.config.captureConsole = true
 
-      var mockWindow = {
+      const mockWindow = {
         console: {
           log: function () {}
         }
@@ -348,7 +348,7 @@ describe('Karma', function () {
       sinon.spy(ck, 'log')
       ck.config.captureConsole = false
 
-      var mockWindow = {
+      const mockWindow = {
         console: {
           log: function () {}
         }
@@ -363,7 +363,7 @@ describe('Karma', function () {
       sinon.spy(ck, 'log')
       ck.config.captureConsole = true
 
-      var mockWindow = {
+      const mockWindow = {
         console: {
           log: function () {
             throw new Error('I am a broken console.log method.')
@@ -381,7 +381,7 @@ describe('Karma', function () {
   })
 
   describe('complete', function () {
-    var clock
+    let clock
 
     before(function () {
       clock = sinon.useFakeTimers()
@@ -392,7 +392,7 @@ describe('Karma', function () {
     })
 
     it('should navigate the client to return_url if specified and allowed', function (done) {
-      var config = {
+      const config = {
         // The default value.
         allowedReturnUrlPatterns: ['^https?://']
       }
@@ -415,7 +415,7 @@ describe('Karma', function () {
     })
 
     it('should not navigate the client to return_url if not allowed', function () {
-      var config = {
+      const config = {
         allowedReturnUrlPatterns: []
       }
 
@@ -435,12 +435,12 @@ describe('Karma', function () {
     })
 
     it('should clear context window upon complete when clearContext config is true', function () {
-      var config = ck.config = {
+      const config = ck.config = {
         clearContext: true
       }
 
       socket.emit('execute', config)
-      var CURRENT_URL = iframe.src
+      const CURRENT_URL = iframe.src
 
       ck.complete()
 
@@ -452,7 +452,7 @@ describe('Karma', function () {
     })
 
     it('should not clear context window upon complete when clearContext config is false', function () {
-      var config = ck.config = {
+      const config = ck.config = {
         clearContext: false
       }
 
@@ -460,7 +460,7 @@ describe('Karma', function () {
       assert(mockTestStatus === 'execute')
 
       clock.tick(1)
-      var CURRENT_URL = iframe.src
+      const CURRENT_URL = iframe.src
       ck.complete()
       clock.tick(1)
       assert.strictEqual(iframe.src, CURRENT_URL)
@@ -469,7 +469,7 @@ describe('Karma', function () {
 
     it('should accept multiple calls to loaded', function () {
       // support for Safari 10 since it supports type=module but not nomodule.
-      var config = ck.config = {
+      const config = ck.config = {
         useIframe: true
       }
 

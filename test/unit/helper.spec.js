@@ -285,7 +285,7 @@ describe('helper', () => {
 
   describe('saveOriginalArgs', () => {
     it('should clone config.client.args', () => {
-      var config = {
+      const config = {
         client: {
           args: ['--somearg']
         }
@@ -299,7 +299,7 @@ describe('helper', () => {
 
   describe('restoreOriginalArgs', () => {
     it('should restore config.client.originalArgs', () => {
-      var config = {
+      const config = {
         client: {
           args: ['--somearg'],
           originalArgs: []

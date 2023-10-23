@@ -31,13 +31,13 @@ module.exports = function (wallaby) {
     ],
 
     bootstrap: function (w) {
-      var path = require('path')
-      var mocha = w.testFramework
+      const path = require('path')
+      const mocha = w.testFramework
 
       mocha.suite.on('pre-require', function () {
         // always passing wallaby.js globals to mocks.loadFile
-        var mocks = require('mocks')
-        var loadFile = mocks.loadFile
+        const mocks = require('mocks')
+        const loadFile = mocks.loadFile
         mocks.loadFile = function (filePath, mocks, globals, mockNested) {
           mocks = mocks || {}
           globals = globals || {}

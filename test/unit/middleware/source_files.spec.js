@@ -1,7 +1,7 @@
 const http = require('http')
 const mocks = require('mocks')
 const request = require('supertest')
-var zlib = require('zlib')
+const zlib = require('zlib')
 
 const helper = require('../../../lib/helper')
 const File = require('../../../lib/file')

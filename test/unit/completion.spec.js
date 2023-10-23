@@ -9,7 +9,7 @@ describe('completion', () => {
     const words = line.split(' ')
 
     return {
-      words: words,
+      words,
       count: words.length,
       last: words[words.length - 1],
       prev: words[words.length - 2]
