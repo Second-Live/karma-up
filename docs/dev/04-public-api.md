@@ -36,7 +36,7 @@ const Server = karma.Server
 parseConfig(
   null,
   { port: 9876 },
-  { promiseConfig: true, throwErrors: true }
+  { promiseConfig: true }
 ).then(
   (karmaConfig) => {
     const server = new Server(karmaConfig, function doneCallback(exitCode) {
@@ -177,7 +177,7 @@ const karma = require('karma')
 karma.config.parseConfig(
   null,
   { port: 9876 },
-  { promiseConfig: true, throwErrors: true }
+  { promiseConfig: true }
 ).then(
   (karmaConfig) => {
     karma.runner.run(karmaConfig, function doneCallback(exitCode, possibleErrorCode) {
@@ -241,7 +241,7 @@ const karma = require('karma')
 karma.config.parseConfig(
   null,
   { port: 9876 },
-  { promiseConfig: true, throwErrors: true }
+  { promiseConfig: true }
 ).then(
   (karmaConfig) => {
     karma.stopper.stop(karmaConfig, function doneCallback(exitCode, possibleErrorCode) {
@@ -300,7 +300,7 @@ const path = require('path');
 cfg.parseConfig(
   path.resolve('./karma.conf.js'),
   { port: 1337 },
-  { promiseConfig: true, throwErrors: true }
+  { promiseConfig: true }
 ).then(
   (karmaConfig) => { /* use the config with the public API */ },
   (rejectReason) => { /* respond to the rejection reason error */ }
@@ -375,30 +375,6 @@ parsing is completed and an immediately fulfilled promise is returned.
 Whether the function exported by the config file returns a promise or not, the
 promise returned by `parseConfig()` will resolve with a parsed configuration
 object, an instance of the `Config` class, as the value.
-
-_**In most cases, `parseOptions.throwErrors = true` should also be set. This
-disables process exiting and allows errors to result in rejected promises.**_
-
-
-##### `parseOptions.throwErrors` option
-
-- **Type:** Boolean
-- **Default Value:** `false`
-
-In the past, `parseConfig()` would call `process.exit(exitCode)` when it
-encountered a critical failure. This meant that your own code had no way of
-responding to failures before the Node.js process exited.
-
-By passing `parseOptions.throwErrors = true`, `parseConfig()` will disable
-process exiting.
-
-For synchronous usage, it will throw an exception instead of exiting the
-process. Your code can then catch the exception and respond how ever it needs
-to.
-
-If the asynchronous API (`parseOptions.promiseConfig = true`) is being used,
-then `parseOptions.throwErrors = true` allows the promise to be rejected
-instead of exiting the process.
 
 
 ## `karma.constants`

@@ -146,7 +146,7 @@ describe('server', () => {
       return cfg.parseConfig(
         null,
         rawConfig,
-        { promiseConfig: true, throwErrors: true }
+        { promiseConfig: true }
       ).then((parsedConfig) => {
         const messageSubstring =
           'Passing raw CLI options to `new Server(config, done)` is ' +

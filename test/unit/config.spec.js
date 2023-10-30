@@ -137,19 +137,9 @@ describe('config', () => {
       expect(config.exclude).to.deep.equal(actual)
     })
 
-    it('should log an error and exit if file does not exist', () => {
-      e.parseConfig('/conf/not-exist.js', {})
-
-      expect(logErrorStub).to.have.been.called
-      const event = logErrorStub.lastCall.args
-      expect(event.toString().split('\n').slice(0, 2)).to.be.deep.equal(
-        ['Error in config file!', '  Error: Cannot find module \'/conf/not-exist.js\''])
-      expect(mocks.process.exit).to.have.been.calledWith(1)
-    })
-
-    it('should log an error and throw if file does not exist AND throwErrors is true', () => {
+    it('should log an error and throw error if file does not exist', () => {
       function parseConfig () {
-        e.parseConfig('/conf/not-exist.js', {}, { throwErrors: true })
+        e.parseConfig('/conf/not-exist.js', {})
       }
 
       expect(parseConfig).to.throw(Error, 'Error in config file!\n  Error: Cannot find module \'/conf/not-exist.js\'')
@@ -157,22 +147,11 @@ describe('config', () => {
       const event = logErrorStub.lastCall.args
       expect(event.toString().split('\n').slice(0, 2)).to.be.deep.equal(
         ['Error in config file!', '  Error: Cannot find module \'/conf/not-exist.js\''])
-      expect(mocks.process.exit).not.to.have.been.called
     })
 
-    it('should log an error and exit if invalid file', () => {
-      e.parseConfig('/conf/invalid.js', {})
-
-      expect(logErrorStub).to.have.been.called
-      const event = logErrorStub.lastCall.args
-      expect(event[0]).to.eql('Error in config file!\n')
-      expect(event[1].message).to.eql('Unexpected token =')
-      expect(mocks.process.exit).to.have.been.calledWith(1)
-    })
-
-    it('should log an error and throw if invalid file AND throwErrors is true', () => {
+    it('should log an error and throw error if invalid file', () => {
       function parseConfig () {
-        e.parseConfig('/conf/invalid.js', {}, { throwErrors: true })
+        e.parseConfig('/conf/invalid.js', {})
       }
 
       expect(parseConfig).to.throw(Error, 'Error in config file!\n SyntaxError: Unexpected token =')
@@ -180,12 +159,11 @@ describe('config', () => {
       const event = logErrorStub.lastCall.args
       expect(event[0]).to.eql('Error in config file!\n')
       expect(event[1].message).to.eql('Unexpected token =')
-      expect(mocks.process.exit).not.to.have.been.called
     })
 
-    it('should log error and throw if file does not export a function AND throwErrors is true', () => {
+    it('should log error and throw if file does not export a function', () => {
       function parseConfig () {
-        e.parseConfig('/conf/export-not-function.js', {}, { throwErrors: true })
+        e.parseConfig('/conf/export-not-function.js', {})
       }
 
       expect(parseConfig).to.throw(Error, 'Config file must export a function!\n')
@@ -193,13 +171,12 @@ describe('config', () => {
       const event = logErrorStub.lastCall.args
       expect(event.toString().split('\n').slice(0, 1)).to.be.deep.equal(
         ['Config file must export a function!'])
-      expect(mocks.process.exit).not.to.have.been.called
     })
 
     it('should log an error and fail when the config file\'s function returns a promise, but `parseOptions.promiseConfig` is not true', () => {
       function parseConfig () {
         e.parseConfig(
-          '/conf/returns-promise-that-resolves.js', {}, { throwErrors: true }
+          '/conf/returns-promise-that-resolves.js', {}
         )
       }
       const expectedErrorMessage =
@@ -211,7 +188,6 @@ describe('config', () => {
       expect(logErrorStub).to.have.been.called
       const event = logErrorStub.lastCall.args
       expect(event[0]).to.be.eql(expectedErrorMessage)
-      expect(mocks.process.exit).not.to.have.been.called
     })
 
     describe('when `parseOptions.promiseConfig` is true', () => {
@@ -245,18 +221,8 @@ describe('config', () => {
         )
       })
 
-      it('should log an error and exit if invalid file', () => {
-        e.parseConfig('/conf/invalid.js', {}, { promiseConfig: true })
-
-        expect(logErrorStub).to.have.been.called
-        const event = logErrorStub.lastCall.args
-        expect(event[0]).to.eql('Error in config file!\n')
-        expect(event[1].message).to.eql('Unexpected token =')
-        expect(mocks.process.exit).to.have.been.calledWith(1)
-      })
-
-      it('should log an error and reject the promise if the config file rejects the promise returned by its function AND throwErrors is true', async () => {
-        const configThatRejects = e.parseConfig('/conf/returns-promise-that-rejects.js', {}, { promiseConfig: true, throwErrors: true }).catch((reason) => {
+      it('should log an error and reject the promise if the config file rejects the promise returned by its function', async () => {
+        const configThatRejects = e.parseConfig('/conf/returns-promise-that-rejects.js', {}, { promiseConfig: true }).catch((reason) => {
           expect(logErrorStub).to.have.been.called
           const event = logErrorStub.lastCall.args
           expect(event[0]).to.eql('Error in config file!\n')
@@ -267,8 +233,8 @@ describe('config', () => {
         return configThatRejects
       })
 
-      it('should log an error and reject the promise if invalid file AND throwErrors is true', async () => {
-        const configThatThrows = e.parseConfig('/conf/invalid.js', {}, { promiseConfig: true, throwErrors: true }).catch((reason) => {
+      it('should log an error and reject the promise if invalid file', async () => {
+        const configThatThrows = e.parseConfig('/conf/invalid.js', {}, { promiseConfig: true }).catch((reason) => {
           expect(logErrorStub).to.have.been.called
           const event = logErrorStub.lastCall.args
           expect(event[0]).to.eql('Error in config file!\n')
