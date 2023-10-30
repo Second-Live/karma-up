@@ -3,6 +3,7 @@ const fs = require('fs')
 const path = require('path')
 const { waitForCondition } = require('./utils')
 const stopper = require('../../../lib/stopper')
+const cfg = require('../../../lib/config')
 
 Given('a default configuration', function () {
   this.writeConfigFile()
@@ -18,8 +19,9 @@ Given('a proxy on port {int} that prepends {string} to the base path', async fun
 })
 
 When('I stop a server programmatically', function (callback) {
-  setTimeout(() => {
-    stopper.stop(this.config, (exitCode) => {
+  setTimeout(async () => {
+    const config = await cfg.parseConfig(this.configFile)
+    stopper.stop(config, (exitCode) => {
       this.stopperExitCode = exitCode
       callback()
     })
