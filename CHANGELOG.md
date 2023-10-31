@@ -1,3 +1,22 @@
+# [7.0.0-alpha.2](https://github.com/Second-Live/karma-up/compare/v7.0.0-alpha.1...v7.0.0-alpha.2) (2023-10-31)
+
+
+### Bug Fixes
+
+* drop promiseConfig option ([d040af3](https://github.com/Second-Live/karma-up/commit/d040af3556381746d3e5720d157cb82944159423))
+* drop throwErrors option ([baabb26](https://github.com/Second-Live/karma-up/commit/baabb2613ae62d30405a9040b955862f529f3806))
+
+
+### Features
+
+* add support unhandledrejection show as error ([bd9d82c](https://github.com/Second-Live/karma-up/commit/bd9d82c321fd1fd0c720a5fce9e659d173d5dd7e))
+
+
+### BREAKING CHANGES
+
+* drop promiseConfig option and parseConfig return Promise
+* drop throwErrors option and parseConfig never call process.exit
+
 # [7.0.0-alpha.1](https://github.com/Second-Live/karma-up/compare/v6.4.2...v7.0.0-alpha.1) (2023-09-19)
 
 
