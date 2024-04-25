@@ -165,13 +165,6 @@
       }
     }
 
-    // To start we will signal the server that we are not reconnecting. If the socket loses
-    // connection and was able to reconnect to the Karma server we will get a
-    // second 'connect' event. There we will pass 'true' and that will be passed to the
-    // Karma server then, so that Karma can differentiate between a socket client
-    // econnect and a full browser reconnect.
-    let socketReconnect = false;
-
     this.VERSION = constant.VERSION;
     this.config = {};
 
@@ -379,36 +372,36 @@
       }
     };
 
-    socket.on('execute', (cfg) => {
-      this.updater.updateTestStatus('execute');
-      // reset startEmitted and reload the iframe
-      startEmitted = false;
-      this.config = cfg;
+    socket.addEventListener('message', (evt) => {
+      const [type, cfg] = JSON.parse(evt.data);
+      if (type === 'stop') {
+        this.complete();
+      } else if (type === 'execute') {
+        this.updater.updateTestStatus('execute');
+        // reset startEmitted and reload the iframe
+        startEmitted = false;
+        this.config = cfg;
 
-      navigateContextTo(constant.CONTEXT_URL);
+        navigateContextTo(constant.CONTEXT_URL);
 
-      if (this.config.clientDisplayNone) {
-        document.querySelectorAll('#banner, #browsers').forEach((el) => (el.hidden = true));
+        if (this.config.clientDisplayNone) {
+          document.querySelectorAll('#banner, #browsers').forEach((el) => (el.hidden = true));
+        }
+        // clear the console before run
+        window.console.clear();
       }
-      // clear the console before run
-      window.console.clear();
     });
-    socket.on('stop', () => this.complete());
 
-    // Report the browser name and Id. Note that this event can also fire if the connection has
-    // been temporarily lost, but the socket reconnected automatically. Read more in the docs:
-    // https://socket.io/docs/client-api/#Event-%E2%80%98connect%E2%80%99
-    socket.on('connect', function () {
+    // Report the browser name and Id.
+    socket.addEventListener('open', () => {
       const info = {
         name: navigator.userAgent,
-        id: browserId,
-        isSocketReconnect: socketReconnect
+        id: browserId
       };
       if (displayName) {
         info.displayName = displayName;
       }
       socket.emit('register', info);
-      socketReconnect = true;
     });
   }
 
@@ -433,13 +426,12 @@
 
     let connectionText = 'never-connected';
     let testText = 'loading';
-    let pingText = '';
 
     function updateBanner () {
       if (!titleElement || !bannerElement) {
         return
       }
-      titleElement.textContent = `Karma v ${VERSION} - ${connectionText}; test: ${testText}; ${pingText}`;
+      titleElement.textContent = `Karma v ${VERSION} - ${connectionText}; test: ${testText};`;
       bannerElement.className = connectionText === 'connected' ? 'online' : 'offline';
     }
 
@@ -451,45 +443,20 @@
       testText = testStatus || testText;
       updateBanner();
     }
-    function updatePingStatus (pingStatus) {
-      pingText = pingStatus || pingText;
-      updateBanner();
-    }
 
-    socket.on('connect', function () {
-      updateConnectionStatus('connected');
-    });
-    socket.on('disconnect', function () {
-      updateConnectionStatus('disconnected');
-    });
-    socket.on('reconnecting', function (sec) {
-      updateConnectionStatus('reconnecting in ' + sec + ' seconds');
-    });
-    socket.on('reconnect', function () {
-      updateConnectionStatus('reconnected');
-    });
-    socket.on('reconnect_failed', function () {
-      updateConnectionStatus('reconnect_failed');
-    });
-
-    socket.on('info', updateBrowsersInfo);
-    socket.on('disconnect', function () {
-      updateBrowsersInfo([]);
-    });
-
-    socket.on('ping', function () {
-      updatePingStatus('ping...');
-    });
-    socket.on('pong', function (latency) {
-      updatePingStatus('ping ' + latency + 'ms');
+    socket.addEventListener('open', () => updateConnectionStatus('connected'));
+    socket.addEventListener('close', () => updateConnectionStatus('disconnected'));
+    socket.addEventListener('message', (event) => {
+      const [type, value] = JSON.parse(event.data);
+      if (type === 'info') {
+        updateBrowsersInfo(value);
+      }
     });
 
     return { updateTestStatus }
   }
 
   var updater$1 = StatusUpdater$1;
-
-  /* global io */
 
   /* eslint-disable no-new */
 
@@ -500,19 +467,12 @@
 
   const KARMA_URL_ROOT = constants.KARMA_URL_ROOT;
   const KARMA_PROXY_PATH = constants.KARMA_PROXY_PATH;
-  const BROWSER_SOCKET_TIMEOUT = constants.BROWSER_SOCKET_TIMEOUT;
 
-  // Connect to the server using socket.io https://socket.io/
-  const socket = io(location.host, {
-    reconnectionDelay: 500,
-    reconnectionDelayMax: Infinity,
-    timeout: BROWSER_SOCKET_TIMEOUT,
-    transports: ['websocket', 'webtransport'],
-    path: KARMA_PROXY_PATH + KARMA_URL_ROOT.slice(1) + 'socket.io',
-    'sync disconnect on unload': true,
-    useNativeTimers: true,
-    closeOnBeforeunload: true
-  });
+  const socket = new WebSocket('ws://' + location.host + KARMA_PROXY_PATH + KARMA_URL_ROOT.slice(1));
+  window.addEventListener('beforeunload', () => socket.close());
+  socket.emit = function (event, data) {
+    this.send(JSON.stringify([event, data]));
+  };
 
   // instantiate the updater of the view
   const updater = new StatusUpdater(socket, util.elm('title'), util.elm('banner'), util.elm('browsers'));

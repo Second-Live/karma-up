@@ -37,13 +37,6 @@ function Karma (updater, socket, iframe, opener, navigator, location, document) 
     }
   }
 
-  // To start we will signal the server that we are not reconnecting. If the socket loses
-  // connection and was able to reconnect to the Karma server we will get a
-  // second 'connect' event. There we will pass 'true' and that will be passed to the
-  // Karma server then, so that Karma can differentiate between a socket client
-  // econnect and a full browser reconnect.
-  let socketReconnect = false
-
   this.VERSION = constant.VERSION
   this.config = {}
 
@@ -251,36 +244,36 @@ function Karma (updater, socket, iframe, opener, navigator, location, document) 
     }
   }
 
-  socket.on('execute', (cfg) => {
-    this.updater.updateTestStatus('execute')
-    // reset startEmitted and reload the iframe
-    startEmitted = false
-    this.config = cfg
+  socket.addEventListener('message', (evt) => {
+    const [type, cfg] = JSON.parse(evt.data)
+    if (type === 'stop') {
+      this.complete()
+    } else if (type === 'execute') {
+      this.updater.updateTestStatus('execute')
+      // reset startEmitted and reload the iframe
+      startEmitted = false
+      this.config = cfg
 
-    navigateContextTo(constant.CONTEXT_URL)
+      navigateContextTo(constant.CONTEXT_URL)
 
-    if (this.config.clientDisplayNone) {
-      document.querySelectorAll('#banner, #browsers').forEach((el) => (el.hidden = true))
+      if (this.config.clientDisplayNone) {
+        document.querySelectorAll('#banner, #browsers').forEach((el) => (el.hidden = true))
+      }
+      // clear the console before run
+      window.console.clear()
     }
-    // clear the console before run
-    window.console.clear()
   })
-  socket.on('stop', () => this.complete())
 
-  // Report the browser name and Id. Note that this event can also fire if the connection has
-  // been temporarily lost, but the socket reconnected automatically. Read more in the docs:
-  // https://socket.io/docs/client-api/#Event-%E2%80%98connect%E2%80%99
-  socket.on('connect', function () {
+  // Report the browser name and Id.
+  socket.addEventListener('open', () => {
     const info = {
       name: navigator.userAgent,
-      id: browserId,
-      isSocketReconnect: socketReconnect
+      id: browserId
     }
     if (displayName) {
       info.displayName = displayName
     }
     socket.emit('register', info)
-    socketReconnect = true
   })
 }
 

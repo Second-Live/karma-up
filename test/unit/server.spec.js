@@ -79,22 +79,20 @@ describe('server', () => {
 
     mockServerSocket = {
       id: 'socket-id',
-      on: (name, handler) => mockSocketEventListeners.set(name, handler),
-      emit: () => {},
-      removeListener: () => {}
+      on(name, handler) { mockSocketEventListeners.set(name, handler) },
+      emitter: {
+        on: (name, handler) => mockSocketEventListeners.set(name, handler),
+        emit: () => {},
+        removeListener: () => {}
+      }
     }
 
     mockSocketServer = {
       close: () => {},
-      flashPolicyServer: {
-        close: () => {}
-      },
-      sockets: {
-        sockets: {},
-        on: (name, handler) => handler(mockServerSocket),
-        emit: () => {},
-        removeAllListeners: () => {}
-      }
+      clients: [],
+      on: (name, handler) => handler(mockServerSocket),
+      emit: () => {},
+      removeAllListeners: () => {}
     }
 
     mockBoundServer = {
@@ -153,13 +151,11 @@ describe('server', () => {
       expect(typeof mockSocketEventListeners.get('error')).to.be.equal('function')
     })
 
-    it('should change config.port to available', (done) => {
+    it('should change config.port to available', async () => {
       expect(config.port).to.be.equal(9876)
-      server.start().then(() => {
-        expect(config.port).to.be.equal(9877)
-        expect(server._boundServer).to.be.equal(mockBoundServer)
-        done()
-      })
+      await server.start()
+      expect(config.port).to.be.equal(9877)
+      expect(server._boundServer).to.be.equal(mockBoundServer)
     })
   })
 
@@ -409,8 +405,11 @@ describe('server', () => {
 
       mockBrowserSocket = {
         id: 'browser-socket-id',
-        on: () => {},
-        emit: () => {}
+        send() {},
+        emitter: {
+          on: () => {},
+          emit: () => {}
+        }
       }
     })
 

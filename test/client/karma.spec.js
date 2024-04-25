@@ -6,13 +6,17 @@ const ContextKarma = require('../../context/karma')
 const MockSocket = require('./mocks').Socket
 
 describe('Karma', function () {
-  let updater, socket, k, ck, windowNavigator, windowLocation, windowStub, startSpy, iframe, clientWindow
+  let updater,
+    socket,
+    k,
+    ck,
+    windowNavigator,
+    windowLocation,
+    windowStub,
+    startSpy,
+    iframe,
+    clientWindow
   let windowDocument, elements, mockTestStatus
-
-  function setTransportTo (transportName) {
-    socket._setTransportNameTo(transportName)
-    socket.emit('connect')
-  }
 
   beforeEach(function () {
     mockTestStatus = ''
@@ -29,21 +33,35 @@ describe('Karma', function () {
     elements = [{ style: {} }, { style: {} }]
     windowDocument = { querySelectorAll: sinon.stub().returns(elements) }
 
-    k = new ClientKarma(updater, socket, iframe, windowStub, windowNavigator, windowLocation, windowDocument)
+    k = new ClientKarma(
+      updater,
+      socket,
+      iframe,
+      windowStub,
+      windowNavigator,
+      windowLocation,
+      windowDocument
+    )
     clientWindow = {
       karma: k
     }
-    ck = new ContextKarma(ContextKarma.getDirectCallParentKarmaMethod(clientWindow))
+    ck = new ContextKarma(
+      ContextKarma.getDirectCallParentKarmaMethod(clientWindow)
+    )
     ck.config = {}
     startSpy = sinon.spy(ck, 'start')
   })
 
-  it('should start execution when all files loaded and pass config', function () {
-    const config = ck.config = {
-      useIframe: true
-    }
+  afterEach(function () {
+    sinon.restore()
+  })
 
-    socket.emit('execute', config)
+  it('should start execution when all files loaded and pass config', function () {
+    const config = (ck.config = {
+      useIframe: true
+    })
+
+    socket.emitMessage('execute', config)
     assert(!startSpy.called)
 
     ck.loaded()
@@ -51,13 +69,13 @@ describe('Karma', function () {
   })
 
   it('should open a new window when useIFrame is false', function (done) {
-    const config = ck.config = {
+    const config = (ck.config = {
       useIframe: false,
       runInParent: false
-    }
+    })
 
-    socket.emit('execute', config)
-    setTimeout(function nextEventLoop () {
+    socket.emitMessage('execute', config)
+    setTimeout(function nextEventLoop() {
       assert(!ck.start.called)
 
       ck.loaded()
@@ -69,8 +87,8 @@ describe('Karma', function () {
 
   it('should not set style on elements', function (done) {
     const config = {}
-    socket.emit('execute', config)
-    setTimeout(function nextEventLoop () {
+    socket.emitMessage('execute', config)
+    setTimeout(function nextEventLoop() {
       assert(Object.keys(elements[0].style).length === 0)
       done()
     })
@@ -78,8 +96,8 @@ describe('Karma', function () {
 
   it('should set display none on elements if clientDisplayNone', function (done) {
     const config = { clientDisplayNone: true }
-    socket.emit('execute', config)
-    setTimeout(function nextEventLoop () {
+    socket.emitMessage('execute', config)
+    setTimeout(function nextEventLoop() {
       assert(elements[0].hidden === true)
       assert(elements[1].hidden === true)
       done()
@@ -88,7 +106,7 @@ describe('Karma', function () {
 
   it('should stop execution', function () {
     sinon.spy(k, 'complete')
-    socket.emit('stop')
+    socket.emitMessage('stop')
     assert(k.complete.called)
   })
 
@@ -100,7 +118,7 @@ describe('Karma', function () {
   })
 
   it('should remove reference to start even after syntax error', function () {
-    function ADAPTER_START_FN () {}
+    function ADAPTER_START_FN() {}
 
     ck.start = ADAPTER_START_FN
     ck.error('syntax error', '/some/file.js', 11)
@@ -113,13 +131,13 @@ describe('Karma', function () {
   })
 
   it('should not set up context if there was an error', function (done) {
-    const config = ck.config = {
+    const config = (ck.config = {
       clearContext: true
-    }
+    })
 
-    socket.emit('execute', config)
+    socket.emitMessage('execute', config)
 
-    setTimeout(function nextEventLoop () {
+    setTimeout(function nextEventLoop() {
       const mockWindow = {}
 
       ck.error('page reload')
@@ -132,13 +150,13 @@ describe('Karma', function () {
   })
 
   it('should setup context if there was error but clearContext config is false', function (done) {
-    const config = ck.config = {
+    const config = (ck.config = {
       clearContext: false
-    }
+    })
 
-    socket.emit('execute', config)
+    socket.emitMessage('execute', config)
 
-    setTimeout(function nextEventLoop () {
+    setTimeout(function nextEventLoop() {
       const mockWindow = {}
 
       ck.error('page reload')
@@ -152,12 +170,12 @@ describe('Karma', function () {
 
   it('should error out if a script attempted to reload the browser after setup', function (done) {
     // Perform setup
-    const config = ck.config = {
+    const config = (ck.config = {
       clearContext: false
-    }
-    socket.emit('execute', config)
+    })
+    socket.emitMessage('execute', config)
 
-    setTimeout(function nextEventLoop () {
+    setTimeout(function nextEventLoop() {
       const mockWindow = {}
       ck.setupContext(mockWindow)
 
@@ -175,12 +193,12 @@ describe('Karma', function () {
 
   it('should error out if a script attempted to reload the browser after setup with clearContext true', function (done) {
     // Perform setup
-    const config = ck.config = {
+    const config = (ck.config = {
       clearContext: true
-    }
-    socket.emit('execute', config)
+    })
+    socket.emitMessage('execute', config)
 
-    setTimeout(function nextEventLoop () {
+    setTimeout(function nextEventLoop() {
       const mockWindow = {}
       ck.setupContext(mockWindow)
 
@@ -197,83 +215,49 @@ describe('Karma', function () {
   })
 
   it('should report navigator name', function () {
-    const spyInfo = sinon.spy(function (info) {
-      assert(info.name === 'Fake browser name')
-    })
-
+    sinon.spy(socket, 'emit')
     windowNavigator.userAgent = 'Fake browser name'
     windowLocation.search = ''
-    socket.on('register', spyInfo)
-    socket.emit('connect')
+    socket.emit('open')
 
-    assert(spyInfo.called)
-  })
-
-  it('should mark "register" event for reconnected socket', function () {
-    // First connect.
-    socket.emit('connect')
-
-    socket.on('register', sinon.spy(function (info) {
-      assert(info.isSocketReconnect === true)
-    }))
-    // Reconnect
-    socket.emit('connect')
+    assert(socket.emit.calledWith('register'))
   })
 
   it('should report browser id', function () {
     windowLocation.search = '?id=567'
     socket = new MockSocket()
-    k = new ClientKarma(updater, socket, {}, windowStub, windowNavigator, windowLocation)
+    k = new ClientKarma(
+      updater,
+      socket,
+      {},
+      windowStub,
+      windowNavigator,
+      windowLocation
+    )
 
-    const spyInfo = sinon.spy(function (info) {
-      assert(info.id === '567')
-    })
+    sinon.spy(socket, 'emit')
+    socket.emit('open')
 
-    socket.on('register', spyInfo)
-    socket.emit('connect')
-
-    assert(spyInfo.called)
+    assert(socket.emit.calledWith('register', sinon.match({ id: '567' })))
   })
 
   describe('result', function () {
     it('should emit "start" with total specs count first', function () {
-      const log = []
-
-      socket.on('result', function () {
-        log.push('result')
-      })
-
-      socket.on('start', function () {
-        log.push('start')
-      })
-
-      setTransportTo('websocket')
-
+      sinon.spy(socket, 'emit')
       // adapter didn't call info({total: x})
       ck.result()
-      assert.deepStrictEqual(log, ['start', 'result'])
+
+      assert(socket.emit.getCall(0).firstArg === 'start')
+      assert(socket.emit.getCall(1).firstArg === 'result')
     })
 
     it('should not emit "start" if already done by the adapter', function () {
-      const log = []
-
-      const spyStart = sinon.spy(function () {
-        log.push('start')
-      })
-
-      const spyResult = sinon.spy(function () {
-        log.push('result')
-      })
-
-      socket.on('result', spyResult)
-      socket.on('start', spyStart)
-
-      setTransportTo('websocket')
+      sinon.spy(socket, 'emit')
 
       ck.info({ total: 321 })
       ck.result()
-      assert.deepStrictEqual(log, ['start', 'result'])
-      assert(spyStart.calledWith({ total: 321 }))
+      assert(socket.emit.getCall(0).calledWith('start', { total: 321 }))
+      assert(socket.emit.getCall(1).firstArg === 'result')
     })
   })
 
@@ -322,8 +306,13 @@ describe('Karma', function () {
       }
 
       ck.setupContext(mockWindow)
-      const promptResult = mockWindow.prompt('What is your favorite color?', 'blue')
-      assert(ck.log.calledWith('prompt', ['What is your favorite color?', 'blue']))
+      const promptResult = mockWindow.prompt(
+        'What is your favorite color?',
+        'blue'
+      )
+      assert(
+        ck.log.calledWith('prompt', ['What is your favorite color?', 'blue'])
+      )
       assert.strictEqual(promptCalled, true)
       assert.strictEqual(promptResult, 'user-input')
     })
@@ -376,7 +365,11 @@ describe('Karma', function () {
       assert(ck.log.calledWith('log'))
       assert.strictEqual(ck.log.args[0][1][0], 'What?')
       assert(ck.log.calledWith('warn'))
-      assert(/^Console method log threw:[\s\S]+I am a broken console\.log method/.test(ck.log.args[1][1][0]))
+      assert(
+        /^Console method log threw:[\s\S]+I am a broken console\.log method/.test(
+          ck.log.args[1][1][0]
+        )
+      )
     })
   })
 
@@ -398,10 +391,19 @@ describe('Karma', function () {
       }
       windowLocation.search = '?id=567&return_url=http://return.com'
       socket = new MockSocket()
-      k = new ClientKarma(updater, socket, iframe, windowStub, windowNavigator, windowLocation)
+      k = new ClientKarma(
+        updater,
+        socket,
+        iframe,
+        windowStub,
+        windowNavigator,
+        windowLocation
+      )
       clientWindow = { karma: k }
-      ck = new ContextKarma(ContextKarma.getDirectCallParentKarmaMethod(clientWindow))
-      socket.emit('execute', config)
+      ck = new ContextKarma(
+        ContextKarma.getDirectCallParentKarmaMethod(clientWindow)
+      )
+      socket.emitMessage('execute', config)
 
       clock.tick(500)
 
@@ -419,25 +421,39 @@ describe('Karma', function () {
         allowedReturnUrlPatterns: []
       }
 
-      windowLocation.search = '?id=567&return_url=javascript:alert(document.domain)'
+      windowLocation.search =
+        '?id=567&return_url=javascript:alert(document.domain)'
       socket = new MockSocket()
-      k = new ClientKarma(updater, socket, iframe, windowStub, windowNavigator, windowLocation)
+      k = new ClientKarma(
+        updater,
+        socket,
+        iframe,
+        windowStub,
+        windowNavigator,
+        windowLocation
+      )
       clientWindow = { karma: k }
-      ck = new ContextKarma(ContextKarma.getDirectCallParentKarmaMethod(clientWindow))
-      socket.emit('execute', config)
+      ck = new ContextKarma(
+        ContextKarma.getDirectCallParentKarmaMethod(clientWindow)
+      )
+      socket.emitMessage('execute', config)
 
       try {
         ck.complete()
         throw new Error('An error should have been caught.')
       } catch (error) {
-        assert(/Error: Security: Navigation to .* was blocked to prevent malicious exploits./.test(error))
+        assert(
+          /Error: Security: Navigation to .* was blocked to prevent malicious exploits./.test(
+            error
+          )
+        )
       }
     })
 
     it('should clear context window upon complete when clearContext config is true', function () {
-      const config = ck.config = {
+      const config = (ck.config = {
         clearContext: true
-      }
+      })
 
       socket.emit('execute', config)
       const CURRENT_URL = iframe.src
@@ -452,11 +468,11 @@ describe('Karma', function () {
     })
 
     it('should not clear context window upon complete when clearContext config is false', function () {
-      const config = ck.config = {
+      const config = (ck.config = {
         clearContext: false
-      }
+      })
 
-      socket.emit('execute', config)
+      socket.emitMessage('execute', config)
       assert(mockTestStatus === 'execute')
 
       clock.tick(1)
@@ -469,11 +485,11 @@ describe('Karma', function () {
 
     it('should accept multiple calls to loaded', function () {
       // support for Safari 10 since it supports type=module but not nomodule.
-      const config = ck.config = {
+      const config = (ck.config = {
         useIframe: true
-      }
+      })
 
-      socket.emit('execute', config)
+      socket.emitMessage('execute', config)
       clock.tick(1)
       assert(!startSpy.called)
 
