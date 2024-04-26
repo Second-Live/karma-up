@@ -1,3 +1,15 @@
+# [7.0.0-alpha.3](https://github.com/Second-Live/karma-up/compare/v7.0.0-alpha.2...v7.0.0-alpha.3) (2024-04-26)
+
+
+### Bug Fixes
+
+* not failed test if onunhandledrejection was fired ([eb8777d](https://github.com/Second-Live/karma-up/commit/eb8777d30548e5d82b3571bb999521b18664a20d))
+
+
+### Features
+
+* use native webSockets and drop socket.io ([e323d60](https://github.com/Second-Live/karma-up/commit/e323d60b10a6a7e2398bab35fdce6718ea30640d))
+
 # [7.0.0-alpha.2](https://github.com/Second-Live/karma-up/compare/v7.0.0-alpha.1...v7.0.0-alpha.2) (2023-10-31)
 
 
