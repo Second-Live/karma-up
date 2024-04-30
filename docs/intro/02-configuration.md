@@ -43,15 +43,12 @@ Press tab to list possible options.
 Config file generated at "/Users/vojta/Code/karma/my.conf.js".
 ```
 
-The configuration file can be written in CoffeeScript as well.
-In fact, if you execute `karma init` with a `*.coffee` extension such as `karma init karma.conf.coffee`, it will generate a CoffeeScript file.
-
 Of course, you can write the config file by hand or copy-paste it from another project ;-)
 
 ## Starting Karma
 When starting Karma, the configuration file path can be passed in as the first argument.
 
-By default, Karma will look for `karma.conf.js` or `karma.conf.coffee` in the current directory.
+By default, Karma will look for `karma.conf.js` in the current directory.
 ```bash
 # Start Karma using your configuration:
 $ karma start my.conf.js

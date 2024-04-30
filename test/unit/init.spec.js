@@ -65,15 +65,6 @@ describe('init', () => {
       expect(processedAnswers.files).to.deep.equal(['test-main.js'])
       expect(processedAnswers.onlyServedFiles).to.deep.equal(['*.js'])
     })
-
-    it('should add coffee preprocessor', () => {
-      const processedAnswers = m.processAnswers(answers({
-        files: ['src/*.coffee']
-      }))
-
-      expect(processedAnswers.preprocessors).to.have.property('**/*.coffee')
-      expect(processedAnswers.preprocessors['**/*.coffee']).to.deep.equal(['coffee'])
-    })
   })
 
   describe('scenario:', () => {
@@ -248,42 +239,6 @@ describe('init', () => {
 
       // autoWatch
       machine.onLine('yes')
-    })
-
-    it('should add coffee preprocessor', (done) => {
-      machine.process(m.questions, (answers) => {
-        const basePath = m.getBasePath('karma.conf.js', '/cwd')
-        const processedAnswers = m.processAnswers(answers, basePath)
-        const generatedConfigCode = formatter.generateConfigFile(processedAnswers)
-        const config = evaluateConfigCode(generatedConfigCode)
-
-        // expect correct configuration
-        expect(config.preprocessors).to.have.property('**/*.coffee')
-        expect(config.preprocessors['**/*.coffee']).to.deep.equal(['coffee'])
-        done()
-      })
-
-      // frameworks
-      machine.onLine('jasmine')
-      machine.onLine('')
-
-      // requirejs
-      machine.onLine('no')
-
-      // browsers
-      machine.onLine('Chrome')
-      machine.onLine('')
-
-      // files
-      machine.onLine('src/*.coffee')
-      machine.onLine('src/**/*.js')
-      machine.onLine('')
-
-      // excludes
-      machine.onLine('')
-
-      // autoWatch
-      machine.onLine('no')
     })
   })
 })

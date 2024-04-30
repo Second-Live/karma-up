@@ -6,16 +6,12 @@ is by using the `karma init` command. This page lists all of the available confi
 Note: Most of the framework adapters, reporters, preprocessors and launchers need to be loaded as [plugins].
 
 
-The Karma configuration file can be written in JavaScript, CoffeeScript, or TypeScript and is loaded as a regular Node.js module.
+The Karma configuration file can be written in JavaScript and is loaded as a regular Node.js module.
 
 Unless provided as argument, the Karma CLI will look for a configuration file at
 
 * `./karma.conf.js`
-* `./karma.conf.coffee`
-* `./karma.conf.ts`
 * `./.config/karma.conf.js`
-* `./.config/karma.conf.coffee`
-* `./.config/karma.conf.ts`
 
 in that order.
 
@@ -33,24 +29,15 @@ module.exports = function(config) {
 };
 ```
 
-```coffeescript
-# karma.conf.coffee
-module.exports = (config) ->
-  config.set
-    basePath: '../..'
-    frameworks: ['jasmine']
-    # ...
-```
-
-```typescript
-// karma.conf.ts
-module.exports = (config) => {
+```javascript
+// karma.conf.js
+exports default function(config) {
   config.set({
     basePath: '../..',
     frameworks: ['jasmine'],
     //...
   });
-}
+};
 ```
 
 Alternatively, you can use an `async` function instead (since v6.3).
@@ -64,21 +51,6 @@ module.exports = async (config) => {
     ...karmaConfig
   });
 };
-```
-
-
-### Customized TypeScript Configuration
-Under the hood Karma uses ts-node to transpile TypeScript to JavaScript. If the resolved `tsconfig.json` has `module` configured as `ES` formats. You might get errors like `SyntaxError: Unexpected token`. This is due that in Node `ES` module formats are not supported. To overcome this issue you need to configure ts-node to use `commonjs` module format.
-
-Create a JavaScript configuration file that overrides the module format.
-```javascript
-// karma.conf.js
-require('ts-node').register({
-  compilerOptions: {
-    module: 'commonjs'
-  }
-});
-require('./karma.conf.ts');
 ```
 
 ## File Patterns

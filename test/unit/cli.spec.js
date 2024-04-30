@@ -16,7 +16,6 @@ describe('cli', () => {
 
   const fsMock = mocks.fs.create({
     cwd: { 'karma.conf.js': true },
-    cwd2: { 'karma.conf.coffee': true },
     cwd3: { 'karma.conf.ts': true }
   })
 
@@ -82,13 +81,6 @@ describe('cli', () => {
       const options = processArgs(['start', '--auto-watch'])
       expect(path.resolve(options.configFile)).to.equal(path.resolve('/cwd/karma.conf.js'))
       expect(options.autoWatch).to.equal(true)
-    })
-
-    it('should set default karma.conf.coffee config file if exists', () => {
-      setCWD('/cwd2')
-      const options = processArgs(['start', '--port', '10'])
-
-      expect(path.resolve(options.configFile)).to.equal(path.resolve('/cwd2/karma.conf.coffee'))
     })
 
     it('should set default karma.conf.ts config file if exists', () => {

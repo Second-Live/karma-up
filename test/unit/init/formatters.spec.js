@@ -58,14 +58,6 @@ describe('init/formatters', () => {
           "\n      'test-main.js',\n      { pattern: 'src/*.js', included: false }"
         )
       })
-
-      it('should format PREPROCESSORS', () => {
-        const replacements = formatter.formatAnswers(createAnswers({ preprocessors: { '*.coffee': ['coffee'] } }))
-
-        expect(replacements.PREPROCESSORS).to.equal(
-          "\n      '*.coffee': ['coffee']"
-        )
-      })
     })
   })
 })
