@@ -10,7 +10,6 @@ Feature: Helpful warning and errors
       browsers = ['ChromeHeadlessNoSandbox'];
       frameworks = ['mocha', 'chai'];
       plugins = [
-        'karma-mocha',
         'karma-chai',
         'karma-chrome-launcher'
       ];

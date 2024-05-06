@@ -9,7 +9,6 @@ Feature: Results reporting
       files = ['reporting/test.js'];
       browsers = ['ChromeHeadlessNoSandbox'];
       plugins = [
-        'karma-mocha',
         'karma-mocha-reporter',
         'karma-chrome-launcher'
       ];

@@ -10,7 +10,6 @@ The recommended way to install plugins is to add them as project dependencies in
 {
   "devDependencies": {
     "karma": "~0.10",
-    "karma-mocha": "~0.0.1",
     "karma-growl-reporter": "~0.0.1",
     "karma-firefox-launcher": "~0.0.1"
   }

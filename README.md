@@ -111,7 +111,6 @@ use the awesome [Socket.io] library and [Node.js].
 [Socket.io]: https://socket.io/
 [Node.js]: https://nodejs.org/
 [Jasmine]: https://github.com/karma-runner/karma-jasmine
-[Mocha]: https://github.com/karma-runner/karma-mocha
 [QUnit]: https://github.com/karma-runner/karma-qunit
 [here]: https://www.youtube.com/watch?v=MVw8N3hTfCI
 [Mailing List]: https://groups.google.com/forum/#!forum/karma-users
