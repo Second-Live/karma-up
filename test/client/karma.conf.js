@@ -111,7 +111,6 @@ module.exports = function (config) {
     reportSlowerThan: 500,
 
     plugins: [
-      'karma-mocha',
       'karma-chrome-launcher',
       'karma-firefox-launcher',
       'karma-junit-reporter',

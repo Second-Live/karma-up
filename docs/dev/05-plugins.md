@@ -101,7 +101,9 @@ This section outlines API requirements and conventions for different plugin type
 
 ### Frameworks
 
-- example plugins: [karma-jasmine], [karma-mocha], [karma-requirejs]
+Mocha JS already included by default and you don't need additinal package for that
+
+- example plugins: [karma-jasmine], [karma-requirejs]
 - use naming convention is `karma-*`
 - use npm keywords `karma-plugin`, `karma-framework`.
 
@@ -174,7 +176,6 @@ A preprocessor is a function that accepts three arguments (`content`, `file`, an
 As Karma is assembled by dependency injection, a plugin can ask for pretty much any Karma component and interact with it. There are a couple of plugins that do more interesting stuff like this, check out [karma-closure], [karma-intellij].
 
 [karma-jasmine]: https://github.com/karma-runner/karma-jasmine
-[karma-mocha]: https://github.com/karma-runner/karma-mocha
 [karma-requirejs]: https://github.com/karma-runner/karma-requirejs
 [karma-growl-reporter]: https://github.com/karma-runner/karma-growl-reporter
 [karma-junit-reporter]: https://github.com/karma-runner/karma-junit-reporter

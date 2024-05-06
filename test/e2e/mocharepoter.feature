@@ -14,7 +14,6 @@ Feature: Mocha reporter
         'karma-jasmine',
         'karma-chrome-launcher',
         'karma-mocha-reporter',
-        'karma-mocha',
         'karma-chai'
       ];
       reporters = ['mocha'];
@@ -36,7 +35,6 @@ Feature: Mocha reporter
         'karma-jasmine',
         'karma-chrome-launcher',
         'karma-mocha-reporter',
-        'karma-mocha',
         'karma-chai'
       ];
       reporters = ['mocha'];
