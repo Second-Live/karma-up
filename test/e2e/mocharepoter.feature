@@ -13,7 +13,6 @@ Feature: Mocha reporter
       plugins = [
         'karma-jasmine',
         'karma-chrome-launcher',
-        'karma-mocha-reporter',
         'karma-chai'
       ];
       reporters = ['mocha'];
@@ -34,7 +33,6 @@ Feature: Mocha reporter
       plugins = [
         'karma-jasmine',
         'karma-chrome-launcher',
-        'karma-mocha-reporter',
         'karma-chai'
       ];
       reporters = ['mocha'];

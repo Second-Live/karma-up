@@ -4,7 +4,7 @@ const vm = require('vm')
 const path = require('path')
 const { mkdirSync } = require('fs')
 const rimraf = require('rimraf')
-const { setWorldConstructor } = require('cucumber')
+const { setWorldConstructor } = require('@cucumber/cucumber')
 const Proxy = require('./proxy')
 
 class World {
