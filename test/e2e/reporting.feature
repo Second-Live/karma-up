@@ -9,13 +9,12 @@ Feature: Results reporting
       files = ['reporting/test.js'];
       browsers = ['ChromeHeadlessNoSandbox'];
       plugins = [
-        'karma-mocha-reporter',
         'karma-chrome-launcher'
       ];
       frameworks = ['mocha']
       reporters = ['mocha']
       """
-    When I start Karma
+    When I start Karma with additional arguments: "--no-color"
     Then it passes with like:
     """
     START:

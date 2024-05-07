@@ -1,4 +1,4 @@
-const { defineParameterType, Given, Then, When } = require('cucumber')
+const { defineParameterType, Given, Then, When } = require('@cucumber/cucumber')
 const fs = require('fs')
 const path = require('path')
 const { waitForCondition } = require('./utils')
