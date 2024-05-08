@@ -1,3 +1,27 @@
+# [7.0.0-alpha.4](https://github.com/Second-Live/karma-up/compare/v7.0.0-alpha.3...v7.0.0-alpha.4) (2024-05-08)
+
+
+### Bug Fixes
+
+* js config color boolean option will be removed ([b72a03e](https://github.com/Second-Live/karma-up/commit/b72a03e0e4c19f633c70259e609873aee560cf78))
+* remove deprecated customFileHandlers ([59b1e0b](https://github.com/Second-Live/karma-up/commit/59b1e0bcc283a008a5023602cb83cce78fabb63d))
+* use ES Modules by default for config files ([e368c2e](https://github.com/Second-Live/karma-up/commit/e368c2e3a00aa527817048b2a5772f0fecf55a53))
+
+
+### Features
+
+* mocha framework included by default ([47f8d9f](https://github.com/Second-Live/karma-up/commit/47f8d9fece9c8ab7535736bba0771df0f9085950))
+* mocha reporter included by default ([7e42fb7](https://github.com/Second-Live/karma-up/commit/7e42fb740895dd7609c20f4b42ce2b9f6c073ea0))
+
+
+### BREAKING CHANGES
+
+* color boolean option JS config will be removed and don't use anymore.
+But still works other options like --no-color, --color and inv variable
+NO_COLOR or FORCE_COLOR
+* deprecated customFileHandlers was removed
+* drop ts-node, coffee and live script for config
+
 # [7.0.0-alpha.3](https://github.com/Second-Live/karma-up/compare/v7.0.0-alpha.2...v7.0.0-alpha.3) (2024-04-26)
 
 

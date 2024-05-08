@@ -89,7 +89,7 @@
   "engines": {
     "node": ">= 18"
   },
-  "version": "7.0.0-alpha.3",
+  "version": "7.0.0-alpha.4",
   "license": "MIT",
   "scripts": {
     "lint": "eslint . --ext js --ignore-pattern *.tpl.js",
