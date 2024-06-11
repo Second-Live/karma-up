@@ -17,16 +17,3 @@ exports.isUndefined = function (value) {
 exports.isDefined = function (value) {
   return !exports.isUndefined(value)
 }
-
-exports.parseQueryParams = function (locationSearch) {
-  var params = {}
-  var pairs = locationSearch.slice(1).split('&')
-  var keyValue
-
-  for (var i = 0; i < pairs.length; i++) {
-    keyValue = pairs[i].split('=')
-    params[decodeURIComponent(keyValue[0])] = decodeURIComponent(keyValue[1])
-  }
-
-  return params
-}

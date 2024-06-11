@@ -1,11 +1,4 @@
-var serialize = null
-try {
-  serialize = require('dom-serialize')
-} catch (e) {
-  // Ignore failure on IE8
-}
-
-var instanceOf = require('./util').instanceOf
+const instanceOf = require('./util').instanceOf
 
 function isNode (obj) {
   return (obj.tagName || obj.nodeName) && obj.nodeType
@@ -42,11 +35,11 @@ function stringify (obj, depth) {
       }
     case 'boolean':
       return obj ? 'true' : 'false'
-    case 'object':
-      var strs = []
+    case 'object': {
+      const strs = []
       if (instanceOf(obj, 'Array')) {
         strs.push('[')
-        for (var i = 0, ii = obj.length; i < ii; i++) {
+        for (let i = 0, ii = obj.length; i < ii; i++) {
           if (i) {
             strs.push(', ')
           }
@@ -62,23 +55,19 @@ function stringify (obj, depth) {
       } else if (obj.outerHTML) {
         return obj.outerHTML
       } else if (isNode(obj)) {
-        if (serialize) {
-          return serialize(obj)
-        } else {
-          return 'Skipping stringify, no support for dom-serialize'
-        }
+        return new window.XMLSerializer().serializeToString(obj)
       } else if (instanceOf(obj, 'Error')) {
         return obj.toString() + '\n' + obj.stack
       } else {
-        var constructor = 'Object'
+        let constructor = 'Object'
         if (obj.constructor && typeof obj.constructor === 'function') {
           constructor = obj.constructor.name
         }
 
         strs.push(constructor)
         strs.push('{')
-        var first = true
-        for (var key in obj) {
+        let first = true
+        for (const key in obj) {
           if (Object.prototype.hasOwnProperty.call(obj, key)) {
             if (first) {
               first = false
@@ -92,6 +81,7 @@ function stringify (obj, depth) {
         strs.push('}')
       }
       return strs.join('')
+    }
     default:
       return obj
   }

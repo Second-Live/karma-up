@@ -23,7 +23,6 @@ Feature: ES Modules
       browsers = ['FirefoxWithModules'];
       frameworks = ['mocha', 'chai'];
       plugins = [
-        'karma-mocha',
         'karma-chai',
         'karma-firefox-launcher'
       ];

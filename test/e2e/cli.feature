@@ -12,7 +12,7 @@ Feature: CLI
       Run --help with particular command to see its description and available options.
 
       Usage:
-        karma-up <command>
+      karma-up <command>
 
       Commands:
         karma-up init [configFile]   Initialize a config file.
@@ -30,7 +30,7 @@ Feature: CLI
     When I execute Karma with arguments: "--version"
     Then the stdout matches RegExp:
       """
-      ^\d+\.\d+\.\d+$
+      ^\d+\.\d+\.\d+(-(alpha|beta)\.\d+)?$
       """
 
   Scenario: Error when command is unknown
@@ -42,7 +42,7 @@ Feature: CLI
       Run --help with particular command to see its description and available options.
 
       Usage:
-        karma-up <command>
+      karma-up <command>
 
       Commands:
         karma-up init [configFile]   Initialize a config file.
@@ -84,7 +84,7 @@ Feature: CLI
       INIT - Initialize a config file.
 
       Usage:
-        karma-up init [configFile]
+      karma-up init [configFile]
 
       Positionals:
         configFile  Name of the generated Karma configuration file            [string]
@@ -105,7 +105,7 @@ Feature: CLI
       START - Start the server / do a single run.
 
       Usage:
-        karma-up start [configFile]
+      karma-up start [configFile]
 
       Positionals:
         configFile  Path to the Karma configuration file                      [string]
@@ -148,7 +148,7 @@ Feature: CLI
       RUN - Run the tests (requires running server).
 
       Usage:
-        karma-up run [configFile] [-- <clientArgs>]
+      karma-up run [configFile] [-- <clientArgs>]
 
       Positionals:
         configFile  Path to the Karma configuration file                      [string]
@@ -184,7 +184,7 @@ Feature: CLI
       STOP - Stop the server (requires running server).
 
       Usage:
-        karma-up stop [configFile]
+      karma-up stop [configFile]
 
       Positionals:
         configFile  Path to the Karma configuration file                      [string]
@@ -204,7 +204,7 @@ Feature: CLI
       COMPLETION - Bash/ZSH completion for karma.
 
       Installation:
-        karma-up completion >> ~/.bashrc
+      karma-up completion >> ~/.bashrc
 
       Options:
         --help  Print usage and options.                                     [boolean]

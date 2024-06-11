@@ -37,7 +37,8 @@ describe('server', () => {
 
     fileListOnResolve = fileListOnReject = null
 
-    mockConfig = {
+    mockConfig = new cfg.Config()
+    mockConfig.set({
       frameworks: [],
       port: 9876,
       autoWatch: true,
@@ -50,7 +51,7 @@ describe('server', () => {
       plugins: [],
       browserDisconnectTolerance: 0,
       browserNoActivityTimeout: 0
-    }
+    })
     server = new Server(mockConfig, doneStub)
 
     sinon.stub(server._injector, 'invoke').returns([])
@@ -78,22 +79,20 @@ describe('server', () => {
 
     mockServerSocket = {
       id: 'socket-id',
-      on: (name, handler) => mockSocketEventListeners.set(name, handler),
-      emit: () => {},
-      removeListener: () => {}
+      on(name, handler) { mockSocketEventListeners.set(name, handler) },
+      emitter: {
+        on: (name, handler) => mockSocketEventListeners.set(name, handler),
+        emit: () => {},
+        removeListener: () => {}
+      }
     }
 
     mockSocketServer = {
       close: () => {},
-      flashPolicyServer: {
-        close: () => {}
-      },
-      sockets: {
-        sockets: {},
-        on: (name, handler) => handler(mockServerSocket),
-        emit: () => {},
-        removeAllListeners: () => {}
-      }
+      clients: [],
+      on: (name, handler) => handler(mockServerSocket),
+      emit: () => {},
+      removeAllListeners: () => {}
     }
 
     mockBoundServer = {
@@ -134,33 +133,6 @@ describe('server', () => {
     logWarnStub.restore()
   })
 
-  describe('constructor', () => {
-    it('should log a warning when the first argument is not an instance of Config', async () => {
-      // Reset the spy interface on the stub. It may have already been called by
-      // code in the `before` or `beforeEach` hooks.
-      logWarnStub.resetHistory()
-
-      const rawConfig = {
-        karmaConfigForTest: true
-      }
-      return cfg.parseConfig(
-        null,
-        rawConfig,
-        { promiseConfig: true, throwErrors: true }
-      ).then((parsedConfig) => {
-        const messageSubstring =
-          'Passing raw CLI options to `new Server(config, done)` is ' +
-          'deprecated.'
-
-        const serverWithParsed = new Server(parsedConfig, doneStub) // eslint-disable-line no-unused-vars
-        expect(logWarnStub).to.not.have.been.calledWith(sinon.match(messageSubstring))
-
-        const serverWithRaw = new Server(rawConfig, doneStub) // eslint-disable-line no-unused-vars
-        expect(logWarnStub).to.have.been.calledOnceWith(sinon.match(messageSubstring))
-      })
-    })
-  })
-
   describe('start', () => {
     let config
     beforeEach(() => {
@@ -172,27 +144,23 @@ describe('server', () => {
         .withArgs('config').returns(config)
     })
 
-    it('should search for available port', (done) => {
-      server.start().then(() => {
-        expect(NetUtils.bindAvailablePort).to.have.been.calledWith(9876, '127.0.0.1')
-        expect(mockBoundServer.address).to.have.been.called
-        expect(typeof mockSocketEventListeners.get('error')).to.be.equal('function')
-        done()
-      })
+    it('should search for available port', async () => {
+      await server.start()
+      expect(NetUtils.bindAvailablePort).to.have.been.calledWith(9876, '127.0.0.1')
+      expect(mockBoundServer.address).to.have.been.called
+      expect(typeof mockSocketEventListeners.get('error')).to.be.equal('function')
     })
 
-    it('should change config.port to available', (done) => {
+    it('should change config.port to available', async () => {
       expect(config.port).to.be.equal(9876)
-      server.start().then(() => {
-        expect(config.port).to.be.equal(9877)
-        expect(server._boundServer).to.be.equal(mockBoundServer)
-        done()
-      })
+      await server.start()
+      expect(config.port).to.be.equal(9877)
+      expect(server._boundServer).to.be.equal(mockBoundServer)
     })
   })
 
   describe('start on watch mode', () => {
-    var config
+    let config
     beforeEach(() => {
       config = { port: 9876, listenAddress: '127.0.0.1', singleRun: false }
       sinon.stub(NetUtils, 'bindAvailablePort').resolves(mockBoundServer)
@@ -407,6 +375,8 @@ describe('server', () => {
       })
 
       it('0 on browser_complete_with_no_more_retries', async () => {
+        mockConfig.failOnEmptyTestSuite = false
+
         await server._start(mockConfig, mockLauncher, null, mockFileList, browserCollection, mockExecutor, doneStub)
 
         server.emit('browser_complete_with_no_more_retries', { id: 'fake', remove: () => {} })
@@ -435,8 +405,11 @@ describe('server', () => {
 
       mockBrowserSocket = {
         id: 'browser-socket-id',
-        on: () => {},
-        emit: () => {}
+        send() {},
+        emitter: {
+          on: () => {},
+          emit: () => {}
+        }
       }
     })
 

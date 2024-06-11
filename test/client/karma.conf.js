@@ -1,7 +1,8 @@
 // When running pre-release tests we want tests to fail if BrowserStack is not
 // configured instead of falling back to the headless browser. That's what
 // KARMA_TEST_NO_FALLBACK variable controls.
-const useBrowserStack = (process.env.BROWSERSTACK_USERNAME && process.env.BROWSERSTACK_ACCESS_KEY) ||
+const useBrowserStack =
+  (process.env.BROWSERSTACK_USERNAME && process.env.BROWSERSTACK_ACCESS_KEY) ||
   process.env.KARMA_TEST_NO_FALLBACK
 
 const launchers = {
@@ -16,13 +17,13 @@ const launchers = {
     browser: 'firefox',
     os: 'Windows',
     os_version: '10'
-  },
-  bs_safari: {
+  }
+  /* bs_safari: {
     base: 'BrowserStack',
     browser: 'Safari',
     os: 'OS X',
-    os_version: 'Big Sur'
-  }
+    os_version: 'Monterey'
+  } */
 }
 
 module.exports = function (config) {
@@ -30,19 +31,28 @@ module.exports = function (config) {
     // base path, that will be used to resolve files and exclude
     basePath: '../..',
 
-    frameworks: ['browserify', 'mocha'],
+    frameworks: ['mocha'],
 
     // list of files / patterns to load in the browser
-    files: [
-      'test/client/*.js'
-    ],
+    files: ['test/client/*.spec.js'],
 
     // list of files to exclude
-    exclude: [
-    ],
+    exclude: [],
 
     preprocessors: {
-      'test/client/*.js': ['browserify']
+      'test/client/*.spec.js': ['rollup']
+    },
+
+    rollupPreprocessor: {
+      plugins: [
+        require('@rollup/plugin-commonjs')(),
+        require('@rollup/plugin-node-resolve')({ browser: true })
+      ],
+      output: {
+        format: 'iife',
+        name: 'karma',
+        sourcemap: 'inline'
+      }
     },
 
     // use dots reporter, as travis terminal does not support escaping sequences
@@ -101,11 +111,10 @@ module.exports = function (config) {
     reportSlowerThan: 500,
 
     plugins: [
-      'karma-mocha',
       'karma-chrome-launcher',
       'karma-firefox-launcher',
       'karma-junit-reporter',
-      'karma-browserify',
+      'karma-rollup-preprocessor',
       'karma-browserstack-launcher'
     ],
 

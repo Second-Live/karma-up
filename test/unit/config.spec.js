@@ -1,6 +1,7 @@
 'use strict'
 
 const path = require('path')
+const url = require('url')
 const loadFile = require('mocks').loadFile
 const helper = require('../../lib/helper')
 const logger = require('../../lib/logger.js')
@@ -27,52 +28,17 @@ describe('config', () => {
   // extract only pattern properties from list of pattern objects
   const patternsFrom = (list) => list.map((pattern) => pattern.pattern)
 
-  const wrapCfg = function (cfg) {
-    return (config) => config.set(cfg)
-  }
-  const wrapAsyncCfg = function (cfg) {
-    return async (config) => config.set(cfg)
-  }
-
   beforeEach(() => {
     mocks = {}
     mocks.process = { exit: sinon.spy() }
-    const mockConfigs = {
-      '/home/config1.js': wrapCfg({ basePath: 'base', reporters: ['dots'] }),
-      '/home/config2.js': wrapCfg({ basePath: '/abs/base' }),
-      '/home/config3.js': wrapCfg({ files: ['one.js', 'sub/two.js'] }),
-      '/home/config4.js': wrapCfg({ port: 123, autoWatch: true, basePath: '/abs/base' }),
-      '/home/config6.js': wrapCfg({ reporters: 'junit' }),
-      '/home/config7.js': wrapCfg({ browsers: ['Chrome', 'Firefox'] }),
-      '/home/config8.js': (config) => config.set({ files: config.suite === 'e2e' ? ['tests/e2e.spec.js'] : ['tests/unit.spec.js'] }),
-      '/home/config9.js': wrapCfg({ client: { useIframe: false } }),
-      '/conf/invalid.js': () => {
-        throw new SyntaxError('Unexpected token =')
-      },
-      '/conf/export-not-function.js': 'not-a-function',
-      // '/conf/export-null.js': null, // Same as `/conf/not-exist.js`?
-      '/conf/exclude.js': wrapCfg({ exclude: ['one.js', 'sub/two.js'] }),
-      '/conf/absolute.js': wrapCfg({ files: ['http://some.com', 'https://more.org/file.js'] }),
-      '/conf/both.js': wrapCfg({ files: ['one.js', 'two.js'], exclude: ['third.js'] }),
-      '/conf/coffee.coffee': wrapCfg({ files: ['one.js', 'two.js'] }),
-      '/conf/default-export.js': { default: wrapCfg({ files: ['one.js', 'two.js'] }) },
-      '/conf/default-config': function noOperations () {},
-      '/conf/returns-promise-that-resolves.js': wrapAsyncCfg({ foo: 'bar' }),
-      '/conf/returns-promise-that-rejects.js': () => {
-        return Promise.reject(new Error('Unexpected Error'))
-      }
-    }
 
     // load file under test
     m = loadFile(path.join(__dirname, '/../../lib/config.js'), mocks, {
       global: {},
       process: mocks.process,
-      Error: Error, // Without this, chai's `.throw()` assertion won't correctly check against constructors.
-      Promise: Promise,
+      Error, // Without this, chai's `.throw()` assertion won't correctly check against constructors.
+      Promise,
       require (path) {
-        if (mockConfigs[path]) {
-          return mockConfigs[path]
-        }
         if (path.indexOf('./') === 0) {
           return require('../../lib/' + path)
         } else {
@@ -85,241 +51,191 @@ describe('config', () => {
 
   describe('parseConfig', () => {
     let logErrorStub
-    let logWarnStub
-    let processExitStub
+
+    const pathConfig1 = resolveWinPath('./test/unit/mocks/config1.js')
+    const pathConfig2 = resolveWinPath('./test/unit/mocks/config2.mjs')
+    let setObject = null
+    let setFunction = null
+
+    before(async () => {
+      const urlPathConfig1 = url.pathToFileURL(pathConfig1)
+      const { setObject: setObj } = await import(urlPathConfig1)
+      setObject = setObj
+      const urlPathConfig2 = url.pathToFileURL(pathConfig2)
+      const { setFunc } = await import(urlPathConfig2)
+      setFunction = setFunc
+    })
 
     beforeEach(() => {
+      e = require('../../lib/config')
       const log = logger.create('config')
       // Silence and monitor logged errors and warnings, regardless of the
       // `logLevel` option.
       logErrorStub = sinon.stub(log, 'error')
-      logWarnStub = sinon.stub(log, 'warn')
-      processExitStub = sinon.stub(process, 'exit')
     })
     afterEach(() => {
-      logErrorStub.restore()
-      logWarnStub.restore()
-      processExitStub.restore()
+      sinon.restore()
     })
 
-    it('should resolve relative basePath to config directory', () => {
-      const config = e.parseConfig('/home/config1.js', {})
-      expect(config.basePath).to.equal(resolveWinPath('/home/base'))
+    it('should resolve relative basePath to config directory', async () => {
+      setObject({ basePath: 'base', reporters: ['dots'] })
+
+      const config = await e.parseConfig(pathConfig1)
+      expect(config.basePath).to.equal(resolveWinPath('./test/unit/mocks/base'))
     })
 
-    it('should keep absolute basePath', () => {
-      const config = e.parseConfig('/home/config2.js', {})
+    it('should keep absolute basePath', async () => {
+      setObject({ basePath: '/abs/base' })
+
+      const config = await e.parseConfig(pathConfig1)
       expect(config.basePath).to.equal(resolveWinPath('/abs/base'))
     })
 
-    it('should resolve all file patterns', () => {
-      const config = e.parseConfig('/home/config3.js', {})
+    it('should resolve all file patterns', async () => {
+      setObject({ basePath: '/home', files: ['one.js', 'sub/two.js'] })
+
+      const config = await e.parseConfig(pathConfig1)
       const actual = [resolveWinPath('/home/one.js'), resolveWinPath('/home/sub/two.js')]
       expect(patternsFrom(config.files)).to.deep.equal(actual)
     })
 
-    it('should keep absolute url file patterns', () => {
-      const config = e.parseConfig('/conf/absolute.js', {})
+    it('should keep absolute url file patterns', async () => {
+      setObject({ files: ['http://some.com', 'https://more.org/file.js'] })
+
+      const config = await e.parseConfig(pathConfig1)
       expect(patternsFrom(config.files)).to.deep.equal([
         'http://some.com',
         'https://more.org/file.js'
       ])
     })
 
-    it('should resolve all exclude patterns', () => {
-      const config = e.parseConfig('/conf/exclude.js', {})
+    it('should resolve all exclude patterns', async () => {
+      setObject({ basePath: '/conf', exclude: ['one.js', 'sub/two.js'] })
+
+      const config = await e.parseConfig(pathConfig1)
       const actual = [
         resolveWinPath('/conf/one.js'),
         resolveWinPath('/conf/sub/two.js'),
-        resolveWinPath('/conf/exclude.js')
+        pathConfig1
       ]
 
       expect(config.exclude).to.deep.equal(actual)
     })
 
-    it('should log an error and exit if file does not exist', () => {
-      e.parseConfig('/conf/not-exist.js', {})
-
-      expect(logErrorStub).to.have.been.called
-      const event = logErrorStub.lastCall.args
-      expect(event.toString().split('\n').slice(0, 2)).to.be.deep.equal(
-        ['Error in config file!', '  Error: Cannot find module \'/conf/not-exist.js\''])
-      expect(mocks.process.exit).to.have.been.calledWith(1)
-    })
-
-    it('should log an error and throw if file does not exist AND throwErrors is true', () => {
-      function parseConfig () {
-        e.parseConfig('/conf/not-exist.js', {}, { throwErrors: true })
+    it('should log an error and throw error if file does not exist', async () => {
+      let message = ''
+      try {
+        await e.parseConfig('/conf/not-exist.js')
+      } catch (e) {
+        message = e.message
       }
 
-      expect(parseConfig).to.throw(Error, 'Error in config file!\n  Error: Cannot find module \'/conf/not-exist.js\'')
+      expect(message.startsWith('Error in config file!\n  Error [ERR_MODULE_NOT_FOUND]: Cannot find module')).to.be.true
       expect(logErrorStub).to.have.been.called
       const event = logErrorStub.lastCall.args
-      expect(event.toString().split('\n').slice(0, 2)).to.be.deep.equal(
-        ['Error in config file!', '  Error: Cannot find module \'/conf/not-exist.js\''])
-      expect(mocks.process.exit).not.to.have.been.called
+      expect(event.toString().split('\n').slice(0, 1)).to.be.deep.equal(
+        ['Error in config file!'])
     })
 
-    it('should log an error and exit if invalid file', () => {
-      e.parseConfig('/conf/invalid.js', {})
+    it('should log an error and throw error if invalid file', async () => {
+      setFunction(() => { throw new SyntaxError('Unexpected token =') })
+      let message = ''
+      try {
+        await e.parseConfig(pathConfig2)
+      } catch (e) {
+        message = e.message
+      }
 
+      expect(message.startsWith('Error in config file!\n SyntaxError: Unexpected token =')).to.be.true
       expect(logErrorStub).to.have.been.called
       const event = logErrorStub.lastCall.args
       expect(event[0]).to.eql('Error in config file!\n')
       expect(event[1].message).to.eql('Unexpected token =')
-      expect(mocks.process.exit).to.have.been.calledWith(1)
     })
 
-    it('should log an error and throw if invalid file AND throwErrors is true', () => {
-      function parseConfig () {
-        e.parseConfig('/conf/invalid.js', {}, { throwErrors: true })
-      }
+    it('should log error and throw if file does not export a function', async () => {
+      const promiseConfig = e.parseConfig(resolveWinPath('./test/unit/mocks/config3.mjs'))
+      await promiseConfig.catch(() => {})
 
-      expect(parseConfig).to.throw(Error, 'Error in config file!\n SyntaxError: Unexpected token =')
-      expect(logErrorStub).to.have.been.called
-      const event = logErrorStub.lastCall.args
-      expect(event[0]).to.eql('Error in config file!\n')
-      expect(event[1].message).to.eql('Unexpected token =')
-      expect(mocks.process.exit).not.to.have.been.called
-    })
-
-    it('should log error and throw if file does not export a function AND throwErrors is true', () => {
-      function parseConfig () {
-        e.parseConfig('/conf/export-not-function.js', {}, { throwErrors: true })
-      }
-
-      expect(parseConfig).to.throw(Error, 'Config file must export a function!\n')
+      expect(promiseConfig).to.be.rejectedWith(Error, 'Config file must export a function!\n')
       expect(logErrorStub).to.have.been.called
       const event = logErrorStub.lastCall.args
       expect(event.toString().split('\n').slice(0, 1)).to.be.deep.equal(
         ['Config file must export a function!'])
-      expect(mocks.process.exit).not.to.have.been.called
     })
 
-    it('should log an error and fail when the config file\'s function returns a promise, but `parseOptions.promiseConfig` is not true', () => {
-      function parseConfig () {
-        e.parseConfig(
-          '/conf/returns-promise-that-resolves.js', {}, { throwErrors: true }
-        )
-      }
-      const expectedErrorMessage =
-        'The `parseOptions.promiseConfig` option must be set to `true` to ' +
-        'enable promise return values from configuration files. ' +
-        'Example: `parseConfig(path, cliOptions, { promiseConfig: true })`'
-
-      expect(parseConfig).to.throw(Error, expectedErrorMessage)
-      expect(logErrorStub).to.have.been.called
-      const event = logErrorStub.lastCall.args
-      expect(event[0]).to.be.eql(expectedErrorMessage)
-      expect(mocks.process.exit).not.to.have.been.called
-    })
-
-    describe('when `parseOptions.promiseConfig` is true', () => {
-      it('should return a promise when promiseConfig is true', () => {
-        // Return value should always be a promise, regardless of whether or not
-        // the config file itself is synchronous or asynchronous and when no
-        // config file path is provided at all.
-        const noConfigFilePromise = e.parseConfig(
-          null, null, { promiseConfig: true }
-        )
-        const syncConfigPromise = e.parseConfig(
-          '/conf/default-config', null, { promiseConfig: true }
-        )
-        const asyncConfigPromise = e.parseConfig(
-          '/conf/returns-promise-that-resolves.js',
-          null,
-          { promiseConfig: true }
-        )
-
-        expect(noConfigFilePromise).to.be.an.instanceof(
-          Promise,
-          'Expected parseConfig to return a promise when no config file path is provided.'
-        )
-        expect(syncConfigPromise).to.be.an.instanceof(
-          Promise,
-          'Expected parseConfig to return a promise when the config file DOES NOT return a promise.'
-        )
-        expect(asyncConfigPromise).to.be.an.instanceof(
-          Promise,
-          'Expected parseConfig to return a promise when the config file returns a promise.'
-        )
+    it('should log an error and reject the promise if the config file rejects the promise returned by its function', async () => {
+      setFunction(() => Promise.reject(new Error('Unexpected Error')))
+      const configThatRejects = e.parseConfig(pathConfig2).catch((reason) => {
+        expect(logErrorStub).to.have.been.called
+        const event = logErrorStub.lastCall.args
+        expect(event[0]).to.eql('Error in config file!\n')
+        expect(event[1].message).to.eql('Unexpected Error')
+        expect(reason.message).to.eql('Error in config file!\n Error: Unexpected Error')
+        expect(reason).to.be.an.instanceof(Error)
       })
+      return configThatRejects
+    })
 
-      it('should log an error and exit if invalid file', () => {
-        e.parseConfig('/conf/invalid.js', {}, { promiseConfig: true })
-
+    it('should log an error and reject the promise if invalid file', async () => {
+      setFunction(() => { throw new SyntaxError('Unexpected token =') })
+      const configThatThrows = e.parseConfig(pathConfig2).catch((reason) => {
         expect(logErrorStub).to.have.been.called
         const event = logErrorStub.lastCall.args
         expect(event[0]).to.eql('Error in config file!\n')
         expect(event[1].message).to.eql('Unexpected token =')
-        expect(mocks.process.exit).to.have.been.calledWith(1)
+        expect(reason.message).to.eql('Error in config file!\n SyntaxError: Unexpected token =')
+        expect(reason).to.be.an.instanceof(Error)
       })
-
-      it('should log an error and reject the promise if the config file rejects the promise returned by its function AND throwErrors is true', async () => {
-        const configThatRejects = e.parseConfig('/conf/returns-promise-that-rejects.js', {}, { promiseConfig: true, throwErrors: true }).catch((reason) => {
-          expect(logErrorStub).to.have.been.called
-          const event = logErrorStub.lastCall.args
-          expect(event[0]).to.eql('Error in config file!\n')
-          expect(event[1].message).to.eql('Unexpected Error')
-          expect(reason.message).to.eql('Error in config file!\n Error: Unexpected Error')
-          expect(reason).to.be.an.instanceof(Error)
-        })
-        return configThatRejects
-      })
-
-      it('should log an error and reject the promise if invalid file AND throwErrors is true', async () => {
-        const configThatThrows = e.parseConfig('/conf/invalid.js', {}, { promiseConfig: true, throwErrors: true }).catch((reason) => {
-          expect(logErrorStub).to.have.been.called
-          const event = logErrorStub.lastCall.args
-          expect(event[0]).to.eql('Error in config file!\n')
-          expect(event[1].message).to.eql('Unexpected token =')
-          expect(reason.message).to.eql('Error in config file!\n SyntaxError: Unexpected token =')
-          expect(reason).to.be.an.instanceof(Error)
-        })
-        return configThatThrows
-      })
+      return configThatThrows
     })
 
-    it('should override config with given cli options', () => {
-      const config = e.parseConfig('/home/config4.js', { port: 456, autoWatch: false })
+    it('should override config with given cli options', async () => {
+      setObject({ port: 123, autoWatch: true, basePath: '/abs/base' })
+
+      const config = await e.parseConfig(pathConfig1, { port: 456, autoWatch: false })
 
       expect(config.port).to.equal(456)
       expect(config.autoWatch).to.equal(false)
       expect(config.basePath).to.equal(resolveWinPath('/abs/base'))
     })
 
-    it('should override config with cli options if the config property is an array', () => {
+    it('should override config with cli options if the config property is an array', async () => {
+      setObject({ browsers: ['Chrome', 'Firefox'] })
       // regression https://github.com/karma-runner/karma/issues/283
-      const config = e.parseConfig('/home/config7.js', { browsers: ['Safari'] })
+      const config = await e.parseConfig(pathConfig1, { browsers: ['Safari'] })
 
       expect(config.browsers).to.deep.equal(['Safari'])
     })
 
-    it('should merge config with cli options if the config property is an object', () => {
+    it('should merge config with cli options if the config property is an object', async () => {
+      setObject({ client: { useIframe: false } })
       // regression https://github.com/karma-runner/grunt-karma/issues/165
-      const config = e.parseConfig('/home/config9.js', { client: { captureConsole: false } })
+      const config = await e.parseConfig(pathConfig1, { client: { captureConsole: false } })
 
       expect(config.client.useIframe).to.equal(false)
       expect(config.client.captureConsole).to.equal(false)
     })
 
-    it('should have access to cli options in the config file', () => {
-      let config = e.parseConfig('/home/config8.js', { suite: 'e2e' })
+    it('should have access to cli options in the config file', async () => {
+      setFunction((config) => config.set({ files: config.suite === 'e2e' ? ['tests/e2e.spec.js'] : ['tests/unit.spec.js'], basePath: '/home' }))
+      let config = await e.parseConfig(pathConfig2, { suite: 'e2e' })
       expect(patternsFrom(config.files)).to.deep.equal([resolveWinPath('/home/tests/e2e.spec.js')])
 
-      config = e.parseConfig('/home/config8.js', {})
+      config = await e.parseConfig(pathConfig2)
       expect(patternsFrom(config.files)).to.deep.equal([resolveWinPath('/home/tests/unit.spec.js')])
     })
 
-    it('should resolve files and excludes to overridden basePath from cli', () => {
-      const config = e.parseConfig('/conf/both.js', { port: 456, autoWatch: false, basePath: '/xxx' })
+    it('should resolve files and excludes to overridden basePath from cli', async () => {
+      setObject({ files: ['one.js', 'two.js'], exclude: ['third.js'] })
+      const config = await e.parseConfig(pathConfig1, { port: 456, autoWatch: false, basePath: '/xxx' })
 
       expect(config.basePath).to.equal(resolveWinPath('/xxx'))
       const actual = [resolveWinPath('/xxx/one.js'), resolveWinPath('/xxx/two.js')]
       expect(patternsFrom(config.files)).to.deep.equal(actual)
       expect(config.exclude).to.deep.equal([
         resolveWinPath('/xxx/third.js'),
-        resolveWinPath('/conf/both.js')
+        pathConfig1
       ])
     })
 
@@ -343,7 +259,7 @@ describe('config', () => {
 
       config = normalizeConfigWithDefaults({ upstreamProxy: {} })
       expect(config.upstreamProxy.path).to.equal('/')
-      expect(config.upstreamProxy.hostname).to.equal('localhost')
+      expect(config.upstreamProxy.hostname).to.equal('127.0.0.1')
       expect(config.upstreamProxy.port).to.equal(9875)
       expect(config.upstreamProxy.protocol).to.equal('http:')
 
@@ -366,58 +282,47 @@ describe('config', () => {
       expect(config.upstreamProxy.path).to.equal('/some/thing/')
     })
 
-    it('should change autoWatch to false if singleRun', () => {
-      // config4.js has autoWatch = true
-      const config = m.parseConfig('/home/config4.js', { singleRun: true })
+    it('should change autoWatch to false if singleRun', async () => {
+      setObject({ port: 123, autoWatch: true, basePath: '/abs/base' })
+      // Config has autoWatch = true
+      const config = await e.parseConfig(pathConfig1, { singleRun: true })
       expect(config.autoWatch).to.equal(false)
     })
 
-    it('should normalize reporters to an array', () => {
-      const config = m.parseConfig('/home/config6.js', {})
+    it('should normalize reporters to an array', async () => {
+      setObject({ reporters: 'junit' })
+      const config = await e.parseConfig(pathConfig1, {})
       expect(config.reporters).to.deep.equal(['junit'])
     })
 
-    it('should compile coffeescript config', () => {
-      const config = e.parseConfig('/conf/coffee.coffee', {})
-      expect(patternsFrom(config.files)).to.deep.equal([
-        resolveWinPath('/conf/one.js'),
-        resolveWinPath('/conf/two.js')
-      ])
-    })
-
-    it('should set defaults with coffeescript', () => {
-      const config = e.parseConfig('/conf/coffee.coffee', {})
-      expect(config.autoWatch).to.equal(true)
-    })
-
-    it('should not read config file, when null', () => {
-      const config = e.parseConfig(null, { basePath: '/some' })
+    it('should not read config file, when null', async () => {
+      const config = await e.parseConfig(null, { basePath: '/some' })
 
       expect(logErrorStub).not.to.have.been.called
       expect(config.basePath).to.equal(resolveWinPath('/some')) // overridden by CLI
       expect(config.urlRoot).to.equal('/')
     }) // default value
 
-    it('should not read config file, when null but still resolve cli basePath', () => {
-      const config = e.parseConfig(null, { basePath: './some' })
+    it('should not read config file, when null but still resolve cli basePath', async () => {
+      const config = await e.parseConfig(null, { basePath: './some' })
 
       expect(logErrorStub).not.to.have.been.called
       expect(config.basePath).to.equal(resolveWinPath('./some'))
       expect(config.urlRoot).to.equal('/')
     }) // default value
 
-    it('should default unset options in client config', () => {
-      let config = e.parseConfig(null, { client: { args: ['--test'] } })
+    it('should default unset options in client config', async () => {
+      let config = await e.parseConfig(null, { client: { args: ['--test'] } })
 
       expect(config.client.useIframe).to.not.be.undefined
       expect(config.client.captureConsole).to.not.be.undefined
 
-      config = e.parseConfig(null, { client: { useIframe: true } })
+      config = await e.parseConfig(null, { client: { useIframe: true } })
 
       expect(config.client.args).to.not.be.undefined
       expect(config.client.captureConsole).to.not.be.undefined
 
-      config = e.parseConfig(null, { client: { captureConsole: true } })
+      config = await e.parseConfig(null, { client: { captureConsole: true } })
 
       expect(config.client.useIframe).to.not.be.undefined
       expect(config.client.args).to.not.be.undefined
@@ -441,11 +346,6 @@ describe('config', () => {
 
       config = normalizeConfigWithDefaults({ protocol: 'unsupported:' })
       expect(config.protocol).to.equal('http:')
-    })
-
-    it('should allow the config to be set of the default export', () => {
-      const config = e.parseConfig('/conf/default-export.js', {})
-      expect(config.autoWatch).to.equal(true)
     })
   })
 

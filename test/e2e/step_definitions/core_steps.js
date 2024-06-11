@@ -1,8 +1,9 @@
-const { defineParameterType, Given, Then, When } = require('cucumber')
+const { defineParameterType, Given, Then, When } = require('@cucumber/cucumber')
 const fs = require('fs')
 const path = require('path')
 const { waitForCondition } = require('./utils')
 const stopper = require('../../../lib/stopper')
+const cfg = require('../../../lib/config')
 
 Given('a default configuration', function () {
   this.writeConfigFile()
@@ -18,8 +19,9 @@ Given('a proxy on port {int} that prepends {string} to the base path', async fun
 })
 
 When('I stop a server programmatically', function (callback) {
-  setTimeout(() => {
-    stopper.stop(this.config, (exitCode) => {
+  setTimeout(async () => {
+    const config = await cfg.parseConfig(this.configFile)
+    stopper.stop(config, (exitCode) => {
       this.stopperExitCode = exitCode
       callback()
     })
@@ -160,8 +162,10 @@ Then(/^the file at ([a-zA-Z0-9/\\_.]+) contains:$/, function (filePath, expected
 })
 
 Then(/^the background (stdout|stderr) (is exactly|contains|matches RegExp):$/, async function (outputType, comparison, expectedOutput) {
-  const message = comparison === 'is exactly' ? 'Expected output to be exactly as above, but got:'
-    : comparison === 'contains' ? 'Expected output to contain the above text, but got:'
+  const message = comparison === 'is exactly'
+    ? 'Expected output to be exactly as above, but got:'
+    : comparison === 'contains'
+      ? 'Expected output to contain the above text, but got:'
       : 'Expected output to match the above RegExp, but got:'
 
   await waitForCondition(

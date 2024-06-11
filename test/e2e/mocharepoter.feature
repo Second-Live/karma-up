@@ -9,12 +9,9 @@ Feature: Mocha reporter
       files = ['mocha/plus.js', 'mocha/test.js'];
       browsers = ['ChromeHeadlessNoSandbox'];
       frameworks = ['mocha', 'chai']
-      colors = true
       plugins = [
         'karma-jasmine',
         'karma-chrome-launcher',
-        'karma-mocha-reporter',
-        'karma-mocha',
         'karma-chai'
       ];
       reporters = ['mocha'];
@@ -31,17 +28,14 @@ Feature: Mocha reporter
       files = ['mocha/plus.js', 'mocha/test.js'];
       browsers = ['ChromeHeadlessNoSandbox'];
       frameworks = ['mocha', 'chai']
-      colors = false
       plugins = [
         'karma-jasmine',
         'karma-chrome-launcher',
-        'karma-mocha-reporter',
-        'karma-mocha',
         'karma-chai'
       ];
       reporters = ['mocha'];
       """
-    When I start Karma
+    When I start Karma with additional arguments: "--no-color"
     Then it passes with like:
       """
       ✔ 2 tests completed

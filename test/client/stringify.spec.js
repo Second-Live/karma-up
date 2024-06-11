@@ -1,7 +1,7 @@
 /* global __karma__ */
-var assert = require('assert')
+const assert = require('chai').assert
 
-var stringify = require('../../common/stringify')
+const stringify = require('../../common/stringify')
 
 describe('stringify', function () {
   it('should serialize symbols', function () {
@@ -26,15 +26,15 @@ describe('stringify', function () {
     function abc (a, b, c) { return 'whatever' }
     function def (d, e, f) { return 'whatever' }
 
-    var abcString = stringify(abc)
-    var partsAbc = ['function', 'abc', '(a, b, c)', '{ ... }']
-    var partsDef = ['function', '(d, e, f)', '{ ... }']
+    const abcString = stringify(abc)
+    const partsAbc = ['function', 'abc', '(a, b, c)', '{ ... }']
+    const partsDef = ['function', '(d, e, f)', '{ ... }']
 
     partsAbc.forEach(function (part) {
       assert(abcString.indexOf(part) > -1)
     })
 
-    var defString = stringify(def)
+    const defString = stringify(def)
     partsDef.forEach(function (part) {
       assert(defString.indexOf(part) > -1)
     })
@@ -44,7 +44,7 @@ describe('stringify', function () {
   //   https://caniuse.com/proxy
   if (window.Proxy) {
     it('should serialize proxied functions', function () {
-      var defProxy = new Proxy(function (d, e, f) { return 'whatever' }, {})
+      const defProxy = new Proxy(function (d, e, f) { return 'whatever' }, {})
       // In Safari stringified Proxy object has ProxyObject as a name, but
       // in other browsers it does not.
       assert.deepStrictEqual(/^function (ProxyObject)?\(\) { ... }$/.test(stringify(defProxy)), true)
@@ -56,9 +56,7 @@ describe('stringify', function () {
   })
 
   it('should serialize objects', function () {
-    var obj
-
-    obj = { a: 'a', b: 'b', c: null, d: true, e: false }
+    let obj = { a: 'a', b: 'b', c: null, d: true, e: false }
     assert(stringify(obj).indexOf("{a: 'a', b: 'b', c: null, d: true, e: false}") > -1)
 
     function MyObj () {
@@ -70,7 +68,7 @@ describe('stringify', function () {
 
     obj = { constructor: null }
 
-    var s = stringify(obj)
+    const s = stringify(obj)
     assert(s.indexOf('{constructor: null}') > -1)
 
     obj = Object.create(null)
@@ -80,7 +78,7 @@ describe('stringify', function () {
   })
 
   it('should serialize html', function () {
-    var div = document.createElement('div')
+    const div = document.createElement('div')
 
     assert.deepStrictEqual(stringify(div).trim().toLowerCase(), '<div></div>')
 
@@ -89,18 +87,18 @@ describe('stringify', function () {
   })
 
   it('should serialize error', function () {
-    var error = new TypeError('Error description')
+    const error = new TypeError('Error description')
     assert(stringify(error).indexOf('Error description') > -1)
   })
 
   it('should serialize DOMParser objects', function () {
-    var parser = new DOMParser()
-    var doc = parser.parseFromString('<test></test>', 'application/xml')
-    assert.deepStrictEqual(stringify(doc), '<test></test>')
+    const parser = new DOMParser()
+    const doc = parser.parseFromString('<test></test>', 'application/xml')
+    assert.deepStrictEqual(stringify(doc), '<test/>')
   })
 
   it('should serialize across iframes', function () {
-    var div = document.createElement('div')
+    const div = document.createElement('div')
     assert.deepStrictEqual(__karma__.stringify(div).trim().toLowerCase(), '<div></div>')
 
     assert.deepStrictEqual(__karma__.stringify([1, 2]), '[1, 2]')

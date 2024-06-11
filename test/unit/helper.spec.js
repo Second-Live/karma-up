@@ -203,15 +203,17 @@ describe('helper', () => {
 
     // load file under test
     const m = loadFile(path.join(__dirname, '/../../lib/helper.js'), {
-      mkdirp: (path, done) => {
-        spy(path)
-        done()
+      fs: {
+        mkdir (path, options, done) {
+          spy(path)
+          done()
+        }
       }
     })
 
     const mkdirIfNotExists = m.exports.mkdirIfNotExists
 
-    it('should call mkdirp', (done) => {
+    it('should call mkdir from fs', (done) => {
       mkdirIfNotExists('/path/to/dir', () => {
         expect(spy).to.have.been.calledOnceWith('/path/to/dir')
         done()
@@ -283,7 +285,7 @@ describe('helper', () => {
 
   describe('saveOriginalArgs', () => {
     it('should clone config.client.args', () => {
-      var config = {
+      const config = {
         client: {
           args: ['--somearg']
         }
@@ -297,7 +299,7 @@ describe('helper', () => {
 
   describe('restoreOriginalArgs', () => {
     it('should restore config.client.originalArgs', () => {
-      var config = {
+      const config = {
         client: {
           args: ['--somearg'],
           originalArgs: []

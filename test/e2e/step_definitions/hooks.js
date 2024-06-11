@@ -1,4 +1,4 @@
-const { After, Before } = require('cucumber')
+const { After, Before } = require('@cucumber/cucumber')
 
 Before(function () {
   this.ensureSandbox()

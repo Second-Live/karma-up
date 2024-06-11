@@ -81,8 +81,8 @@ describe('FileList', () => {
       }
 
       List = proxyquire('../../lib/file-list', {
-        helper: helper,
-        glob: glob,
+        helper,
+        glob,
         path: pathLib.posix,
         'graceful-fs': mockFs
       })
@@ -210,8 +210,8 @@ describe('FileList', () => {
       }
 
       List = proxyquire('../../lib/file-list', {
-        helper: helper,
-        glob: glob,
+        helper,
+        glob,
         path: pathLib.posix,
         'graceful-fs': mockFs
       })
@@ -248,8 +248,8 @@ describe('FileList', () => {
       }
 
       List = proxyquire('../../lib/file-list', {
-        helper: helper,
-        glob: glob,
+        helper,
+        glob,
         path: pathLib.posix,
         'graceful-fs': mockFs
       })
@@ -446,8 +446,8 @@ describe('FileList', () => {
 
       List = proxyquire('../../lib/file-list', {
         lodash: _.runInContext(),
-        helper: helper,
-        glob: glob,
+        helper,
+        glob,
         'graceful-fs': mockFs,
         path: pathLib.posix
       })
@@ -571,8 +571,8 @@ describe('FileList', () => {
       // from sinon
       List = proxyquire('../../lib/file-list', {
         lodash: _.runInContext(),
-        helper: helper,
-        glob: glob,
+        helper,
+        glob,
         'graceful-fs': mockFs,
         path: pathLib.posix
       })
@@ -624,7 +624,7 @@ describe('FileList', () => {
       // MATCH: /some/a.js, /some/b.js, /a.txt
       list = new List(patterns('/some/*.js', '/a.*'), [], emitter, preprocess)
 
-      var modified = sinon.stub()
+      const modified = sinon.stub()
       emitter.on('file_list_modified', modified)
 
       return list.refresh().then((files) => {
@@ -693,8 +693,8 @@ describe('FileList', () => {
       // from sinon
       List = proxyquire('../../lib/file-list', {
         lodash: _.runInContext(),
-        helper: helper,
-        glob: glob,
+        helper,
+        glob,
         'graceful-fs': mockFs,
         path: pathLib.posix
       })
@@ -775,8 +775,8 @@ describe('FileList', () => {
       // from sinon
       List = proxyquire('../../lib/file-list', {
         lodash: _.runInContext(),
-        helper: helper,
-        glob: glob,
+        helper,
+        glob,
         'graceful-fs': mockFs,
         path: pathLib.posix
       })

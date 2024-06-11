@@ -1,50 +1,31 @@
-const browserify = require('browserify')
-const watchify = require('watchify')
-const { createWriteStream } = require('fs')
+const { rollup, watch } = require('rollup')
 const { readFile } = require('fs').promises
 
-const bundleResourceToFile = (inPath, outPath) => {
-  return new Promise((resolve, reject) => {
-    browserify(inPath).bundle()
-      .once('error', (e) => reject(e))
-      .pipe(createWriteStream(outPath))
-      .once('finish', () => resolve())
+const bundleResourceToFile = async (inPath, outPath) => {
+  const build = await rollup({
+    input: inPath,
+    plugins: [require('@rollup/plugin-commonjs')()]
   })
+  await build.write({ file: outPath, format: 'iife' })
+  build.close()
 }
 
-const bundleResource = (inPath) => {
-  return new Promise((resolve, reject) => {
-    browserify(inPath).bundle((err, buffer) => {
-      if (err != null) {
-        reject(err)
-        return
-      }
-
-      resolve(buffer)
-    })
+const bundleResource = async (inPath) => {
+  const build = await rollup({
+    input: inPath,
+    plugins: [require('@rollup/plugin-commonjs')()]
   })
+  const generated = await build.generate({ format: 'iife' })
+  build.close()
+  return Buffer.from(generated.output[0].code)
 }
 
-const watchResourceToFile = (inPath, outPath) => {
-  const b = browserify({
-    entries: [inPath],
-    cache: {},
-    packageCache: {},
-    plugin: [watchify]
+const watchResourceToFile = async (inPath, outPath) => {
+  watch({
+    input: inPath,
+    plugins: [require('@rollup/plugin-commonjs')()],
+    output: { file: outPath, format: 'iife' }
   })
-
-  const bundle = () => {
-    b.bundle()
-      .once('error', (e) => {
-        console.error(`Failed to bundle ${inPath} into ${outPath}.`)
-        console.error(e)
-      })
-      .pipe(createWriteStream(outPath))
-      .once('finish', () => console.log(`Bundled ${inPath} into ${outPath}.`))
-  }
-
-  b.on('update', bundle)
-  bundle()
 }
 
 const main = async () => {
@@ -58,7 +39,10 @@ const main = async () => {
     const actualClient = await readFile('static/karma.js')
     const actualContext = await readFile('static/context.js')
 
-    if (Buffer.compare(expectedClient, actualClient) !== 0 || Buffer.compare(expectedContext, actualContext) !== 0) {
+    if (
+      Buffer.compare(expectedClient, actualClient) !== 0 ||
+      Buffer.compare(expectedContext, actualContext) !== 0
+    ) {
       // eslint-disable-next-line no-throw-literal
       throw 'Bundled client assets are outdated. Forgot to run "npm run build"?'
     }

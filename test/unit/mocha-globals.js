@@ -13,18 +13,18 @@ chai.use(require('chai-as-promised'))
 chai.use(require('sinon-chai'))
 chai.use(require('chai-subset'))
 
-beforeEach(() => {
-  global.sinon = sinon.createSandbox()
+exports.mochaHooks = {
+  beforeEach () {
+    // Use https://log4js-node.github.io/log4js-node/recording.html to verify logs
+    const vcr = { vcr: { type: 'recording' } }
+    logger.setup('INFO', false, vcr)
+  },
 
-  // Use https://log4js-node.github.io/log4js-node/recording.html to verify logs
-  const vcr = { vcr: { type: 'recording' } }
-  logger.setup('INFO', false, vcr)
-})
-
-afterEach(() => {
-  global.sinon.restore()
-  recording.erase()
-})
+  afterEach () {
+    global.sinon.restore()
+    recording.erase()
+  }
+}
 
 // TODO(vojta): move to helpers or something
 chai.use((chai, utils) => {

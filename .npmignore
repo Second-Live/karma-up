@@ -12,7 +12,6 @@ karma-integration-tests
 
 TODO.md
 CONTRIBUTING.md
-Gruntfile.coffee
 credentials
 Karma.sublime-*
 
