@@ -1,3 +1,10 @@
+## [7.0.1](https://github.com/Second-Live/karma-up/compare/v7.0.0...v7.0.1) (2024-06-11)
+
+
+### Bug Fixes
+
+* unhandledrejection should call log with second parameter as array ([f1d57a3](https://github.com/Second-Live/karma-up/commit/f1d57a3d4f9bffab013971729654ed7ad6ec640d))
+
 # [7.0.0](https://github.com/Second-Live/karma-up/compare/v6.4.2...v7.0.0) (2024-06-11)
 
 
