@@ -1,3 +1,51 @@
+# [7.0.0](https://github.com/Second-Live/karma-up/compare/v6.4.2...v7.0.0) (2024-06-11)
+
+
+### Bug Fixes
+
+* drop promiseConfig option ([d040af3](https://github.com/Second-Live/karma-up/commit/d040af3556381746d3e5720d157cb82944159423))
+* drop throwErrors option ([baabb26](https://github.com/Second-Live/karma-up/commit/baabb2613ae62d30405a9040b955862f529f3806))
+* eslint rules ([afb466d](https://github.com/Second-Live/karma-up/commit/afb466dfd6c7f6a269dbf4eefd12ee548305880f))
+* js config color boolean option will be removed ([b72a03e](https://github.com/Second-Live/karma-up/commit/b72a03e0e4c19f633c70259e609873aee560cf78))
+* not failed test if onunhandledrejection was fired ([eb8777d](https://github.com/Second-Live/karma-up/commit/eb8777d30548e5d82b3571bb999521b18664a20d))
+* remove deprecated customFileHandlers ([59b1e0b](https://github.com/Second-Live/karma-up/commit/59b1e0bcc283a008a5023602cb83cce78fabb63d))
+* upgrade and set socket.io closeOnBeforeunload option to true ([d533a22](https://github.com/Second-Live/karma-up/commit/d533a228a9586c79a03353bfb3d36eedd5c16ae5))
+* use ES Modules by default for config files ([e368c2e](https://github.com/Second-Live/karma-up/commit/e368c2e3a00aa527817048b2a5772f0fecf55a53))
+
+
+### chore
+
+* drop Node 10, 12, 14 ([01f265f](https://github.com/Second-Live/karma-up/commit/01f265f6c9974ca3a11a336b8a27909eb2649210))
+
+
+### Continuous Integration
+
+* drop Node 16 ([747c20a](https://github.com/Second-Live/karma-up/commit/747c20a5dbe6874aeec4e6637dfce1fa5f5991a6))
+
+
+### Features
+
+* add support unhandledrejection show as error ([bd9d82c](https://github.com/Second-Live/karma-up/commit/bd9d82c321fd1fd0c720a5fce9e659d173d5dd7e))
+* drop IE support ([a832dd5](https://github.com/Second-Live/karma-up/commit/a832dd57a62a22788cd30533b5a07ba6b89159fd))
+* mocha framework included by default ([47f8d9f](https://github.com/Second-Live/karma-up/commit/47f8d9fece9c8ab7535736bba0771df0f9085950))
+* mocha reporter included by default ([7e42fb7](https://github.com/Second-Live/karma-up/commit/7e42fb740895dd7609c20f4b42ce2b9f6c073ea0))
+* udpate glob to last version ([fdac871](https://github.com/Second-Live/karma-up/commit/fdac8711411d53a2869906bf3828fe5533151c7b))
+* use native webSockets and drop socket.io ([e323d60](https://github.com/Second-Live/karma-up/commit/e323d60b10a6a7e2398bab35fdce6718ea30640d))
+
+
+### BREAKING CHANGES
+
+* color boolean option JS config will be removed and don't use anymore.
+But still works other options like --no-color, --color and inv variable
+NO_COLOR or FORCE_COLOR
+* deprecated customFileHandlers was removed
+* drop ts-node, coffee and live script for config
+* drop promiseConfig option and parseConfig return Promise
+* drop throwErrors option and parseConfig never call process.exit
+* Drop not supported Node js version 16
+* Drop IE Support
+* Drop not supported Node js versions 10,12,14
+
 # [7.0.0-alpha.4](https://github.com/Second-Live/karma-up/compare/v7.0.0-alpha.3...v7.0.0-alpha.4) (2024-05-08)
 
 
